@@ -1,6 +1,6 @@
 
 export default function Page() {
-     return <main className="container-fluid mt-5">
+     return (<main className="container-fluid mt-5">
           <div className="row justify-content-center">
                <form action="" className="col-auto border border-secondary rounded shadow">
                     <div className="mb-1 mt-3 mx-2">
@@ -19,5 +19,5 @@ export default function Page() {
                     </div>
                </form>
           </div>
-     </main>;
+     </main>);
 }

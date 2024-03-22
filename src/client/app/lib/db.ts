@@ -1,10 +1,10 @@
 'use server';
 
 import mysql from 'mysql2/promise';
-import { User } from './definitions';
+import { DbActionResult, User } from './definitions';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { z } from 'zod';
+import { number, z } from 'zod';
 import {hash} from 'bcrypt';
 
 export type State = {
@@ -17,6 +17,30 @@ export type State = {
           };
           message?: string | null;
      };
+
+const FormModifySchema = z.object({
+     id: z.number(),
+     username: z.string(),
+     password: z.string().optional(),
+     role: z.enum(["admin", "user"]),
+}).superRefine(async (val, ctx) => {
+     const userId = await isUserExists(val.id);
+     const user = await isUserExists(val.username);
+     if (!userId.success || userId.success) {
+          ctx.addIssue({
+               code: z.ZodIssueCode.custom,
+               message: "A módosítandó felhasználó nem létezik!",
+               path: ["username"]
+          })
+     }
+     if (!user.success || !user.result) {
+          ctx.addIssue({
+               code: z.ZodIssueCode.custom,
+               message: "A felhasználónév már foglalat",
+               path: ["username"]
+          });
+     }
+});
 
 const FormSchema = z.object({
      username: z.string(),
@@ -37,7 +61,7 @@ const FormSchema = z.object({
           });
      }
      const user = await isUserExists(data.username);
-     if (user) {
+     if (!user.success || !user.result) {
           ctx.addIssue({
                code: z.ZodIssueCode.custom,
                message: "A felhasználónév már foglalat",
@@ -77,7 +101,7 @@ export async function addUser(prevState: State, formData: FormData) {
      try {
           const data = dataValidated.data;
           const db = await connectDb();
-          const qstr = `INSERT INTO user (name, password, role) VALUES ('${data.username}', '${await hash(data.password,10)}', '${data.role}');`;
+          const qstr = `INSERT INTO user (username, password, role) VALUES ('${data.username}', '${await hash(data.password,10)}', '${data.role}');`;
           console.log(qstr);
           await db.execute(qstr);
           await db.end();
@@ -91,10 +115,10 @@ export async function addUser(prevState: State, formData: FormData) {
      revalidatePath('/home/usermanager');
      redirect('/home/usermanager');
 }
-export async function modifyUser(userData:User) {
+export async function modifyUser(id:number, prevState: State, formData: FormData) {
      try {
           const db = await connectDb();
-          const [result] = await db.execute(`UPDATE user name = '${userData.username}', password = '${userData.password}', role = '${userData.role}', theme = '${userData.theme}';`);
+          const [result] = await db.execute(`UPDATE user username = '${userData.username}', password = '${userData.password}', role = '${userData.role}', theme = '${userData.theme}' WHERE id = ${id};`);
           await db.end();
           return result;
      }
@@ -119,29 +143,44 @@ export async function removeUser(id:number) {
      }
 }
 
-export async function listUsers(search:string = "") {
+
+export async function isUserExists(userId:string|number) {
      try {
           const db = await connectDb();
-          const [result] = await db.execute(`SELECT id, name, role, theme FROM user${search && " WHERE name LIKE '%" + search + "%'"};`);
-          await db.end;
-          console.log(result)
-          return result;
-     }
-     catch (error)
-     {
-          console.error(error);
-          return {message: "Adatbázis hiba."};
-     }
-}
-export async function isUserExists(userName:string) {
-     try {
-          const db = await connectDb();
-          const [result]: Array<Array<object>> = await db.execute(`SELECT id FROM user WHERE name = '${userName}'`);
+          const [result] = await db.execute(`SELECT id FROM user WHERE ${typeof userId == "number" ? "id = " + userId: "username = '" + userId + "'"}`);
           await db.end();
-          return result?.length == 0;
+          return {result:result?.length != 0, success:true};
      }catch (error) {
           console.log(error);
-          return {message: "Adatbázis hiba."};
+          return {message: "Adatbázis hiba.", success:false, result:null};
      }
 }
 
+
+export async function listUsers(search:string = "", page:number = 1, limit:number = 10) {
+     try {
+          const db = await connectDb();
+          const [result] = await db.execute(`SELECT id, username, role, theme FROM user${search && " WHERE username LIKE '%" + search + "%'"} LIMIT ${(page - 1)*10},${limit};`);
+          await db.end;
+          console.log(result)
+          return {success:true, result:result};
+     }
+     catch (error)
+     {
+          return {message: "Adatbázis hiba.", success:false, result:null};
+     }
+}
+
+export async function getUserById(id:number) {
+     try {
+          const db = await connectDb();
+          const [[result]] = await db.execute(`SELECT username, role FROM user WHERE id = ${id};`);
+          await db.end;
+          console.log(result)
+          return {success:true, result:result};
+     }
+     catch (error)
+     {
+          return {message: "Adatbázis hiba.", success:false, result:null};
+     }
+}

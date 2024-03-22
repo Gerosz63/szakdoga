@@ -34,7 +34,7 @@ export default function Navbar() {
                     <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
                          <div className="navbar-nav">
                               {links.map((e) => {
-                                   return (<Link key={e.name} className={clsx("nav-link", {"active": linkPath == e.path} )} href={e.path}>{e.text}</Link>);
+                                   return (<Link key={e.name} className={clsx("nav-link", {"active": linkPath.startsWith(e.path)} )} href={e.path}>{e.text}</Link>);
                               })}
                          </div>
                          <div className="w-100 d-flex justify-content-end">

@@ -1,7 +1,9 @@
+'use client;'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useDebouncedCallback } from 'use-debounce';
 
 
 export default function UserSearch() {
@@ -10,7 +12,7 @@ export default function UserSearch() {
      const pathname = usePathname();
      const { replace } = useRouter();
 
-     function handleSearch(value:string) {
+     const handleSearch = useDebouncedCallback((value:string) => {
           const params = new URLSearchParams(searchParams);
           if (value) {
                params.set('query', value);
@@ -18,7 +20,7 @@ export default function UserSearch() {
                params.delete('query');
           }
           replace(`${pathname}?${params.toString()}`);
-     }
+     }, 300);
 
      return (
           <div className="input-group">

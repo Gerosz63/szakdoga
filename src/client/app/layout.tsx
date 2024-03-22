@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import {Athiti} from "next/font/google"
 import "./custom.scss";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Athiti({ weight: "500", subsets:["latin"] });
 
 export const metadata: Metadata = {
   title: "Create Next App",

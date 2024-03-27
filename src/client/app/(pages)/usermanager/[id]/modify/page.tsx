@@ -1,4 +1,4 @@
-import { getUserById } from "@/app/lib/db";
+import { getUserById } from "@/app/lib/actions";
 import FormSkeleton from "@/app/ui/skeletons/userModifyFormSkeleton";
 import UserModifyForm from "@/app/ui/user-modify-form";
 import { Suspense } from "react";

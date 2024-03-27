@@ -1,26 +1,25 @@
-'use client';
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {faUser} from '@fortawesome/free-regular-svg-icons';
+import { faUser } from '@fortawesome/free-regular-svg-icons';
 
 export default function Navbar() {
      const linkPath = usePathname();
      const links = [
           {
-               name: "result",
-               path: "/home/results",
-               text: "Eredmények"
-          },
-          {
                name: "simulator",
-               path: "/home/simulate",
+               path: "/simulate",
                text: "Szimulátor"
           },
           {
+               name: "result",
+               path: "/results",
+               text: "Eredmények"
+          },
+          {
                name: "usermanager",
-               path: "/home/usermanager",
+               path: "/usermanager",
                text: "Felhasználók"
           }
      ];
@@ -32,15 +31,31 @@ export default function Navbar() {
                          <span className="navbar-toggler-icon"></span>
                     </button>
                     <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
-                         <div className="navbar-nav">
+                         <ul className="navbar-nav me-auto mb-2 mb-md-0">
                               {links.map((e) => {
-                                   return (<Link key={e.name} className={clsx("nav-link", {"active": linkPath.startsWith(e.path)} )} href={e.path}>{e.text}</Link>);
+                                   return (
+                                        <li key={e.name} className="nav-item ">
+                                             <Link  className={clsx("nav-link", { "active": linkPath.startsWith(e.path) })} href={e.path}>{e.text}</Link>
+                                        </li>
+                                   );
                               })}
-                         </div>
-                         <div className="w-100 d-flex justify-content-end">
-                              <button type="button" className="btn btn-outline-secondary border rounded-3">
-                                   <FontAwesomeIcon className="m-1" icon={faUser} />
-                              </button>
+                         </ul>
+                         <div className="d-flex">
+                              <div className="dropdown">
+                                   <button className="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <FontAwesomeIcon icon={faUser} />
+                                   </button>
+                                   <ul className="dropdown-menu dropdown-menu-end">
+                                        <li></li>
+                                        <li><Link href="/profile">Adatok módosítása</Link></li>
+                                        <li><hr className="dropdown-divider" /></li>
+                                        <li>
+                                             <form action="">
+                                                  <button className="dropdown-item" type="submit">Kijelentkezés</button>
+                                             </form>
+                                        </li>
+                                   </ul>
+                              </div>
                          </div>
                     </div>
                </div>

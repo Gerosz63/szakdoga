@@ -1,9 +1,8 @@
 'use client';
 
 import { useFormState } from 'react-dom';
-import { User } from "../lib/definitions";
 import Link from "next/link";
-import { addUser } from "../lib/db";
+import { addUser } from "@/app/lib/actions";
 import clsx from 'clsx';
 import { ChangeEvent, useState } from 'react';
 
@@ -25,9 +24,11 @@ export default function UserCreateForm() {
                     break;
                case "password":
                     setPasswordState(false);
+                    setPasswordRepState(false);
                     break;
                case "password_rep":
                     setPasswordRepState(false);
+                    setPasswordState(false);
                     break;
                case "role":
                     setRoleState(false);
@@ -101,7 +102,7 @@ export default function UserCreateForm() {
                          <option value="user">Felhasználó</option>
                     </select>
                     {
-                         (state.errors?.role && roleState) &&
+                         (state.errors.role && roleState) &&
                          <div className='invalid-feedback'>
                               {
                                    state.errors.role.map((error: string) => (
@@ -114,7 +115,7 @@ export default function UserCreateForm() {
                     }
                </div>
                <div className="d-flex justify-content-between">
-                    <Link className="btn btn-secondary" href="/home/usermanager">Vissza</Link>
+                    <Link className="btn btn-secondary" href="/usermanager">Vissza</Link>
                     <button name="submitBtn" onClick={(e) => inputChange(e)} className="btn btn-success" type="submit">Létrehozás</button>
                </div>
           </form>

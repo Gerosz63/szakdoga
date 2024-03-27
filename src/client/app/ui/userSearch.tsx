@@ -1,4 +1,4 @@
-'use client;'
+'use client';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
@@ -25,7 +25,7 @@ export default function UserSearch() {
      return (
           <div className="input-group">
                <input defaultValue={searchParams.get('query')?.toString()} onChange={(e) => handleSearch(e.target.value)} type="text" className="form-control" placeholder="Keress felhasználó névre..." />
-               <Link href="/home/usermanager/create" className="btn btn-outline-success"><FontAwesomeIcon icon={faPlus} /></Link>
+               <Link href="/usermanager/create" className="btn btn-outline-success"><FontAwesomeIcon icon={faPlus} /></Link>
           </div>
      );
 }

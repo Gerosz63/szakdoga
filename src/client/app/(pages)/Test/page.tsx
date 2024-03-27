@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import {listUsers} from '../lib/db'
+import { listUsers } from '@/app/lib/actions'
 
 export default function Page() {
      const [state, setText] = useState("");
@@ -12,6 +12,7 @@ export default function Page() {
      }
 
      return (
+
           <div className="container-fluid mt-5">
                <div className="row justify-content-center">
                     <form className="col-auto" action={test1}>

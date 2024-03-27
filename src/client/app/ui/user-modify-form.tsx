@@ -1,13 +1,13 @@
 'use client';
 
 import { useFormState } from 'react-dom';
-import { DbActionResult, User } from "../lib/definitions";
+import { DbActionResult, User } from "@/app/lib/definitions";
 import Link from "next/link";
-import { modifyUser } from "../lib/db";
+import { modifyUser } from "@/app/lib/actions";
 import clsx from 'clsx';
 import { ChangeEvent, useState } from 'react';
 
-export default function UserModifyForm({id, userData}: {id:number, userData:DbActionResult<User>}) {
+export default function UserModifyForm({id, userData}: {id:number, userData:DbActionResult<User>|DbActionResult<null>}) {
 
      const initialState = { message: null, errors: {} };
      const modifyUserDp = modifyUser.bind(null, id);
@@ -61,7 +61,7 @@ export default function UserModifyForm({id, userData}: {id:number, userData:DbAc
                
                <div className="mb-3">
                     <label className="form-label" htmlFor="password">Jelszó:</label>
-                    <input value={passwordValue} onChange={(e) => inputChange(e)} className={clsx("form-control", {"is-invalid": passwordState.validate && state.errors?.password, "is-valid": passwordState.validate && Object.keys(state.errors ?? {}).length !== 0 && !state.errors?.password}, {"visually-hidden": !passwordState.visibility})} type="password" name="password" id="password" required/>
+                    <input value={passwordValue} onChange={(e) => inputChange(e)} className={clsx("form-control", {"is-invalid": passwordState.validate && state.errors?.password, "is-valid": passwordState.validate && Object.keys(state.errors ?? {}).length !== 0 && !state.errors?.password}, {"visually-hidden": !passwordState.visibility})} type="password" name="password" id="password"/>
                     {
                          (state.errors?.password && passwordState.validate) &&
                          <div className='invalid-feedback'>
@@ -100,8 +100,11 @@ export default function UserModifyForm({id, userData}: {id:number, userData:DbAc
                          </div>
                     }
                </div>
+               <div className='invalid-feedback'>
+                    {state.message}
+               </div>
                <div className="d-flex justify-content-between">
-                    <Link className="btn btn-secondary" href="/home/usermanager">Vissza</Link>
+                    <Link className="btn btn-secondary" href="/usermanager">Vissza</Link>
                     <button name="submitBtn" onClick={(e) => inputChange(e)} className="btn btn-warning" type="submit">Mentés</button>
                </div>
           </form>

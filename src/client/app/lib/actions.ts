@@ -1,9 +1,12 @@
 "use server";
 import { revalidatePath } from "next/cache";
 import { exec_query } from "./db";
-import { DbActionResult, FormModifySchema, FormSchema, State, User } from "./definitions";
+import { DbActionResult, State, User } from "./definitions";
 import { redirect } from "next/navigation";
 import { hash } from "bcrypt";
+import { signIn, signOut } from "@/auth";
+import { AuthError } from "next-auth";
+import { FormModifySchema, FormSchema } from "./schemas";
 
 
 export async function addUser(prevState: State, formData: FormData) {
@@ -110,7 +113,7 @@ export async function getUserById(id: number) {
 }
 
 export async function getUserByName(name: string) {
-          const q =  `SELECT username, password, role FROM user WHERE username = '${name}';`;
+          const q =  `SELECT id, username, password, role FROM user WHERE username = '${name}';`;
           const res = await exec_query(q);
      
      if (!res.success) {
@@ -122,4 +125,23 @@ export async function getUserByName(name: string) {
           return { message: "A felhasználó nem létezik!", success: false, result: null } as DbActionResult<null>;
      }
      return { success: true, result: res.result[0] as User } as DbActionResult<User>;
+}
+
+export async function login(prevState:string|undefined, formData:FormData) {
+     try {
+          await signIn("credentials", formData)
+     } catch (error) {
+          if (error instanceof AuthError) {
+               switch (error.type) {
+                    case "CredentialsSignin":
+                         return "Hibás felhasználónév vagy jelszó!";
+                    default:
+                         return "Hiba történt próbáld később!";
+               }
+          }
+          throw error;
+     }
+}
+export async function logout() {
+     await signOut();
 }

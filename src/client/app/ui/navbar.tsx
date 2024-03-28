@@ -1,8 +1,10 @@
+"user client";
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUser } from '@fortawesome/free-regular-svg-icons';
+import { logout } from "@/app/lib/actions";
 
 export default function Navbar() {
      const linkPath = usePathname();
@@ -50,7 +52,9 @@ export default function Navbar() {
                                         <li><Link href="/profile">Adatok módosítása</Link></li>
                                         <li><hr className="dropdown-divider" /></li>
                                         <li>
-                                             <form action="">
+                                             <form action={async (e) => {
+                                                  await logout();
+                                             }}>
                                                   <button className="dropdown-item" type="submit">Kijelentkezés</button>
                                              </form>
                                         </li>

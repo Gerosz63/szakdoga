@@ -18,6 +18,6 @@ export async function exec_query(query:string) {
           await db.end();
           return {success:true, result:result};
      } catch (error) {
-          return {success:false, message: "Adatbázi hiba. (" + error+")", result:null};
+          return {success:false, message: `Adatbázis hiba. (${error})`, result:null};
      }
 }

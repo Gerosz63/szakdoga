@@ -1,29 +1,43 @@
 "use client";
 import { useFormState, useFormStatus } from 'react-dom';
 import clsx from 'clsx';
+import { login } from '@/app/lib/actions';
+import { useEffect } from 'react';
+import { usePathname, useRouter, useSearchParams} from 'next/navigation';
+import { defaultLoginRedirect } from '../lib/definitions';
 
 
 export default function Page() {
-     //const [errorMessage, dispatch] = useFormState(authenticate, undefined);
+     const [errorMessage, dispatch] = useFormState(login, undefined);
+     const searchParams = useSearchParams();
+     const pathname = usePathname();
+     const { replace } = useRouter();
+     useEffect(() => {
+          const params = new URLSearchParams(searchParams);
+          if (!params.has("callbackUrl")) {
+               params.set('callbackUrl', window.location.href.replace("/login", defaultLoginRedirect));
+               replace(`${pathname}?${params.toString()}`);
+          }
+     }, []);
+
      const { pending } = useFormStatus();
-     // {dispatch}, { "is-invalid": errorMessage }
-     // {
-     //      errorMessage &&
-     //      (<div className='invalid-feedback'>
-     //           {errorMessage}
-     //      </div>)
-     // }
      return (
           <main className="container-fluid mt-5">
                <div className="row justify-content-center">
-                    <form action="" className="col-auto border border-secondary rounded shadow"> 
+                    <form action={dispatch} className="col-auto border border-secondary rounded shadow">
                          <div className="mb-1 mt-3 mx-2">
                               <label className="form-label" htmlFor="username">Felhasználó név:</label>
-                              <input className={clsx("form-control")} type="text" name="username" id="username" required />
+                              <input className={clsx("form-control", { "is-invalid": errorMessage })} type="text" name="username" id="username" required />
                          </div>
                          <div className="mb-3 mx-2">
                               <label className="form-label" htmlFor="password">Jelszó:</label>
-                              <input className={clsx("form-control")} type="password" name="password" id="password" required />
+                              <input className={clsx("form-control", { "is-invalid": errorMessage })} type="password" name="password" id="password" required />
+                              {
+                                   errorMessage &&
+                                   (<div className='invalid-feedback'>
+                                        {errorMessage}
+                                   </div>)
+                              }
                          </div>
                          <div className="mb-3 mx-2">
                               <button className="btn btn-primary w-100" type="submit" aria-disabled={pending}>Belépés</button>

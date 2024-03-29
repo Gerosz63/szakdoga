@@ -5,8 +5,11 @@ import clsx from 'clsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUser } from '@fortawesome/free-regular-svg-icons';
 import { logout } from "@/app/lib/actions";
+import { useSession } from "next-auth/react";
+import { faArrowRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 
 export default function Navbar() {
+     const user = useSession().data?.user;
      const linkPath = usePathname();
      const links = [
           {
@@ -19,12 +22,16 @@ export default function Navbar() {
                path: "/results",
                text: "Eredmények"
           },
-          {
-               name: "usermanager",
-               path: "/usermanager",
-               text: "Felhasználók"
-          }
+
      ];
+     if (user?.role === "admin")
+          links.push(
+               {
+                    name: "usermanager",
+                    path: "/usermanager",
+                    text: "Felhasználók"
+               }
+          );
      return (
           <nav className="navbar navbar-expand-lg bg-body-tertiary">
                <div className="container-fluid">
@@ -37,7 +44,7 @@ export default function Navbar() {
                               {links.map((e) => {
                                    return (
                                         <li key={e.name} className="nav-item ">
-                                             <Link  className={clsx("nav-link", { "active": linkPath.startsWith(e.path) })} href={e.path}>{e.text}</Link>
+                                             <Link className={clsx("nav-link", { "active": linkPath.startsWith(e.path) })} href={e.path}>{e.text}</Link>
                                         </li>
                                    );
                               })}
@@ -45,17 +52,17 @@ export default function Navbar() {
                          <div className="d-flex">
                               <div className="dropdown">
                                    <button className="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <FontAwesomeIcon icon={faUser} />
+                                        {user?.name} <FontAwesomeIcon icon={faUser} />
                                    </button>
                                    <ul className="dropdown-menu dropdown-menu-end">
                                         <li></li>
-                                        <li><Link href="/profile">Adatok módosítása</Link></li>
+                                        <li><Link className="dropdown-item" href="/profile">Profilom</Link></li>
                                         <li><hr className="dropdown-divider" /></li>
                                         <li>
                                              <form action={async (e) => {
                                                   await logout();
                                              }}>
-                                                  <button className="dropdown-item" type="submit">Kijelentkezés</button>
+                                                  <button className="dropdown-item" type="submit"><FontAwesomeIcon icon={faArrowRightFromBracket} /> Kijelentkezés</button>
                                              </form>
                                         </li>
                                    </ul>

@@ -1,6 +1,6 @@
 import NextAuth, { type DefaultSession } from 'next-auth';
-import Credentials from 'next-auth/providers/credentials';
 import { authConfig } from '@/auth.config';
+import Credentials from 'next-auth/providers/credentials';
 import { z } from 'zod';
 import { compare } from 'bcrypt';
 import { getUserByName } from '@/app/lib/actions';
@@ -71,9 +71,7 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
 
                }
 
-               console.log(session);
                return session;
           },
      }
-
 });

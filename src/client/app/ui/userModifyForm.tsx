@@ -1,20 +1,21 @@
 'use client';
 
 import { useFormState } from 'react-dom';
+import { DbActionResult, User } from "@/app/lib/definitions";
 import Link from "next/link";
-import { addUser } from "@/app/lib/actions";
+import { modifyUser } from "@/app/lib/actions";
 import clsx from 'clsx';
 import { ChangeEvent, useState } from 'react';
 
+export default function Form({id, userData}: {id:number, userData:DbActionResult<User>|DbActionResult<null>}) {
 
-export default function UserCreateForm() {
      const initialState = { message: null, errors: {} };
-
-     const [state, dispatch] = useFormState(addUser, initialState);
+     const modifyUserDp = modifyUser.bind(null, id);
+     const [state, dispatch] = useFormState(modifyUserDp, initialState);
      const [userNameState, setUserNameState] = useState(true);
-     const [passwordState, setPasswordState] = useState(true);
-     const [passwordRepState, setPasswordRepState] = useState(true);
+     const [passwordState, setPasswordState] = useState({visibility:false, validate:true});
      const [roleState, setRoleState] = useState(true);
+     const [passwordValue, setPasswordValue] = useState("");
 
      function inputChange(event:ChangeEvent<HTMLInputElement>) {
           console.log("Név: " + event.target.name);
@@ -23,20 +24,15 @@ export default function UserCreateForm() {
                     setUserNameState(false);
                     break;
                case "password":
-                    setPasswordState(false);
-                    setPasswordRepState(false);
-                    break;
-               case "password_rep":
-                    setPasswordRepState(false);
-                    setPasswordState(false);
+                    setPasswordValue(event.target.value);
+                    setPasswordState({visibility: passwordState.visibility, validate:false});
                     break;
                case "role":
                     setRoleState(false);
                     break;
                case "submitBtn": 
                     setUserNameState(true);
-                    setPasswordState(true);
-                    setPasswordRepState(true);
+                    setPasswordState({visibility: passwordState.visibility, validate:true});;
                     setRoleState(true);
                     break;
                default: 
@@ -48,7 +44,7 @@ export default function UserCreateForm() {
           <form action={dispatch}>
                <div className="mb-3">
                     <label className="form-label" htmlFor="username">Felhasználónév:</label>
-                    <input onChange={(e) => inputChange(e)} className={clsx("form-control", {"is-invalid": state.errors?.username && userNameState, "is-valid": userNameState && Object.keys(state.errors ?? {}).length !== 0 && !state.errors?.username})} type="text" name="username" id="username" required/>
+                    <input defaultValue={userData.result?.username} onChange={(e) => inputChange(e)} className={clsx("form-control", {"is-invalid": state.errors?.username && userNameState, "is-valid": userNameState && Object.keys(state.errors ?? {}).length !== 0 && !state.errors?.username})} type="text" name="username" id="username" required/>
                     {
                          (state.errors?.username && userNameState) &&
                          <div className='invalid-feedback'>
@@ -65,9 +61,9 @@ export default function UserCreateForm() {
                
                <div className="mb-3">
                     <label className="form-label" htmlFor="password">Jelszó:</label>
-                    <input onChange={(e) => inputChange(e)} className={clsx("form-control", {"is-invalid": passwordState && state.errors?.password, "is-valid": passwordState && Object.keys(state.errors ?? {}).length !== 0 && !state.errors?.password})} type="password" name="password" id="password" required/>
+                    <input value={passwordValue} onChange={(e) => inputChange(e)} className={clsx("form-control", {"is-invalid": passwordState.validate && state.errors?.password, "is-valid": passwordState.validate && Object.keys(state.errors ?? {}).length !== 0 && !state.errors?.password}, {"visually-hidden": !passwordState.visibility})} type="password" name="password" id="password"/>
                     {
-                         (state.errors?.password && passwordState) &&
+                         (state.errors?.password && passwordState.validate) &&
                          <div className='invalid-feedback'>
                               {
                                    state.errors.password.map((error: string) => (
@@ -78,31 +74,21 @@ export default function UserCreateForm() {
                               }
                          </div>
                     }
-               </div>
-               <div className="mb-3">
-                    <label className="form-label" htmlFor="password_rep">Jelszó újra:</label>
-                    <input onChange={(e) => inputChange(e)} className={clsx("form-control", {"is-invalid": passwordRepState && state.errors?.password_rep, "is-valid": passwordRepState && Object.values(state.errors ?? {}).length !== 0 && !state.errors?.password_rep})} type="password" name="password_rep" id="password_rep" />
-                    {
-                         (state.errors?.password_rep && passwordRepState) &&
-                         <div className='invalid-feedback'>
-                              {
-                                   state.errors.password_rep.map((error: string) => (
-                                        <p key={error}>
-                                             {error}
-                                        </p>
-                                   ))
-                              }
+                    <div className="container-fluid mt-2">
+                         <div className="row justify-content-between">
+                              <button onClick={(e) => {setPasswordState({visibility: false, validate:passwordState.validate}); setPasswordValue("");}} type='button' className={clsx('col-auto btn btn-secondary', {"visually-hidden": !passwordState.visibility})}>Mégsem</button>
+                              <button onClick={(e) => {setPasswordState({visibility: true, validate:passwordState.validate}); setPasswordValue("");}} type='button' className='col-auto btn btn-secondary' disabled={passwordState.visibility}>Visszaállítás</button>
                          </div>
-                    }
+                    </div>
                </div>
                <div className="mb-3">
                     <label className="form-label" htmlFor="role">Jogosultság kör:</label>
-                    <select onChange={(e) => inputChange(e)} className={clsx("form-control", {"is-invalid": roleState && state.errors?.role, "is-valid": roleState && Object.keys(state.errors ?? {}).length !== 0 && !state.errors?.role})} name="role" id="role">
+                    <select defaultValue={userData.result?.role} onChange={(e) => inputChange(e)} className={clsx("form-control", {"is-invalid": roleState && state.errors?.role, "is-valid": roleState && Object.keys(state.errors ?? {}).length !== 0 && !state.errors?.role})} name="role" id="role">
                          <option value="admin">Admin</option>
                          <option value="user">Felhasználó</option>
                     </select>
                     {
-                         (state.errors.role && roleState) &&
+                         (state.errors?.role && roleState) &&
                          <div className='invalid-feedback'>
                               {
                                    state.errors.role.map((error: string) => (
@@ -114,9 +100,12 @@ export default function UserCreateForm() {
                          </div>
                     }
                </div>
+               <div className='invalid-feedback'>
+                    {state.message}
+               </div>
                <div className="d-flex justify-content-between">
                     <Link className="btn btn-secondary" href="/usermanager">Vissza</Link>
-                    <button name="submitBtn" onClick={(e) => inputChange(e)} className="btn btn-success" type="submit">Létrehozás</button>
+                    <button name="submitBtn" onClick={(e) => inputChange(e)} className="btn btn-warning" type="submit">Mentés</button>
                </div>
           </form>
      );

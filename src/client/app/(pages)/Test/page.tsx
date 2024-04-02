@@ -1,29 +1,13 @@
 'use client';
-
-import { useState } from 'react';
-import { listUsers } from '@/app/lib/actions'
-
 export default function Page() {
-     const [state, setText] = useState("");
-
-     async function test1() {
-          const u = await listUsers("t");
-          setText(u.toString());
-     }
 
      return (
 
-          <div className="container-fluid mt-5">
-               <div className="row justify-content-center">
-                    <form className="col-auto" action={test1}>
-                         <button className="btn btn-outline-secondary" type="submit">Db search</button>
-                    </form>
+          <>
+               <div className="col-md">
+                    <label className="form-label" htmlFor="gmax">Maximális termelés:</label>
+                    <input className="form-control is-invalid" id="gmax" required type="text" value="" name="gmax"/>
                </div>
-               <div className="row justify-content-center">
-                    <div className="col-auto">
-                         <p id="res">{state}</p>
-                    </div>
-               </div>
-          </div>
+          </>
      );
 }

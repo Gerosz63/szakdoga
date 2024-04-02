@@ -10,6 +10,7 @@ import { faArrowRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 
 export default function Navbar() {
      const user = useSession().data?.user;
+     
      const linkPath = usePathname();
      const links = [
           {

@@ -1,4 +1,4 @@
-import UserCreateForm from "@/app/ui/user-create-form";
+import Form from "@/app/ui/userCreateForm";
 
 
 export default function Page() {
@@ -6,7 +6,7 @@ export default function Page() {
           <div className="container-fluid mt-4">
                <div className="row justify-content-center">
                     <div className="col-lg-5">
-                         <UserCreateForm />
+                         <Form />
                     </div>
                </div>
           </div> 

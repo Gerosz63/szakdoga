@@ -1,8 +1,8 @@
 
 import { Suspense } from "react";
 import UserTableSkeleton from "@/app/ui/skeletons/userTableSkeleton";
-import UserTable from "@/app/ui/userTable";
-import UserSearch from "@/app/ui/userSearch";
+import Table from "@/app/ui/userTable";
+import Search from "@/app/ui/userSearch";
 import { listUsers } from "@/app/lib/actions";
 import { DbActionResult, User } from "@/app/lib/definitions";
 
@@ -23,14 +23,14 @@ export default async function Page({
           <div className="container-fluid mt-5">
                <div className="row justify-content-center">
                     <div className="col-md-7">
-                         <UserSearch />
+                         <Search />
                     </div>
                </div>
                <hr />
                <div className="row justify-content-center">
                     <div className="col-md-7">
                          <Suspense key={query + currentPage} fallback={<UserTableSkeleton />}>
-                              <UserTable users={users} />
+                              <Table users={users} />
                          </Suspense>
                     </div>
                </div>

@@ -116,7 +116,7 @@ class VPPEnergyStorage(VPPItem):
         return np.concatenate([np.zeros(T, dtype=np.float32), np.full(T, (1-self.charge_loss)*self.charge_cost, dtype=np.float32), np.full(T,(1+self.discharge_loss)*self.discharge_cost, dtype=np.float32)], axis=0)
 
 class VPPSolarPanel(VPPItem):
-    def __init__(self, r_max:float, delta_r_plus_max:float, delta_r_minus_max:float, cost:float, T:int, r0:float|None = None, starting:int=0, exp_v:float=13, range:float=8, value_at_end:float=0.001, addNoise:bool=True, seed=None):
+    def __init__(self, r_max:float, delta_r_plus_max:float, delta_r_minus_max:float, cost:float, T:int, r0:float|None = None, shift_start:int=0, exp_v:float=13, range:float=8, value_at_end:float=0.001, addNoise:bool=True, seed=None):
         # Ellenőrzések:
         if delta_r_plus_max < 0. or r_max < 0. or delta_r_minus_max < 0. or T < 0:
             raise Exception("A delta_r_plus_max, r_max, delta_r_minus_max, T értékek nem lehetnek 0-nál kisebbek!")
@@ -140,13 +140,13 @@ class VPPSolarPanel(VPPItem):
         y[y < 0] = 0
         
         # A kezdő intervallum beállítása, ha helytelenül lenne megadva
-        if starting < 0:
-            starting = 0
-        elif starting >= T:
-            starting = T - 1
+        if shift_start < 0:
+            shift_start = 0
+        elif shift_start >= T:
+            shift_start = T - 1
 
-        if starting != 0:
-            y = np.roll(y, -starting)
+        if shift_start != 0:
+            y = np.roll(y, -shift_start)
 
         self.r_max_values = y * r_max
 
@@ -161,7 +161,9 @@ class VPPSolarPanel(VPPItem):
         if r0 != None:
             if r0 < 0:
                 r0 = 0
-            self.r0 = r0
+            elif r0 > r_max:
+                r0 = r_max
+            self.r0 = self.r_max_values[0]
         else:
             self.r0 = None
     

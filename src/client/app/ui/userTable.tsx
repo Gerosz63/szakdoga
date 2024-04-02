@@ -7,7 +7,7 @@ import { faMoon } from "@fortawesome/free-regular-svg-icons";
 import { useState } from "react";
 import { removeUser } from "@/app/lib/actions";
 
-export default function UserTable({users}: {users:DbActionResult<[User]> | DbActionResult<null>}) {
+export default function Table({users}: {users:DbActionResult<[User]> | DbActionResult<null>}) {
      const [state, setState] = useState({username:"", id:-1});
 
      return (

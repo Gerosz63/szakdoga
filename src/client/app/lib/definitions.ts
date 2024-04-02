@@ -5,18 +5,134 @@ export type User = {
      role: "admin" | "user",
      theme?: "dark" | "light"
 };
+
+type GeneratorBase = {
+     id: number,
+     uid: number,
+     name: string,
+     active: boolean,
+};
+
+export type GasEngine = GeneratorBase & {
+     gmax: number | string,
+     gplusmax: number | string,
+     gminusmax: number | string,
+     cost: number | string,
+     g0: number | string,
+};
+
+export type SolarPanel = GeneratorBase & {
+     r_max: number | string,
+     delta_r_plus_max: number | string,
+     delta_r_minus_max: number | string,
+     cost: number | string,
+     r0: number | string,
+     shift_start: number | string,
+     exp_v: number | string,
+     range: number | string,
+     value_at_end: number | string,
+     addNoise: boolean | string,
+     seed: number | string,
+};
+
+export type EnergyStorage = GeneratorBase & {
+     storage_min: number | string,
+     storage_max: number | string,
+     charge_max: number | string,
+     discharge_max: number | string,
+     charge_loss: number | string,
+     discharge_loss: number | string,
+     charge_cost: number | string,
+     discharge_cost: number | string,
+     s0: number | string,
+};
+
 export type DbActionResult<T> = {
      success: boolean,
      result: T | null,
      message?: string
 };
-export type State = {
+
+export const GasEngineNameExchange: GasEngine = {
+     id: 0,
+     uid: 0,
+     name: "",
+     active: false,
+     gmax: "Maximális termelés",
+     gplusmax: "Maximális felfutási ráta",
+     gminusmax: "Maximális lefutási ráta",
+     cost: "Költség megtermelt egységenként",
+     g0: "Kezdeti termelés",
+};
+
+export type DBSortName = {
+     GAS: string,
+     SOLAR: string,
+     STORE: string
+};
+
+export const DbNameExchange: DBSortName = {
+     GAS: "gas_engines",
+     SOLAR: "solar_panel",
+     STORE: "energy_storage",
+}
+
+export type UserState = {
      errors?: {
           username?: string[];
           password?: string[];
           password_rep?: string[];
           role?: string[];
           theme?: string[];
+          general?: string[];
+     };
+     message?: string | null;
+};
+
+export type GasEngineState = {
+     errors?: {
+          name?: string[];
+          gmax?: string[];
+          gplusmax?: string[];
+          gminusmax?: string[];
+          cost?: string[];
+          g0?: string[];
+          general?: string[];
+     };
+     message?: string | null;
+};
+
+export type EnergyStorageState = {
+     errors?: {
+          name?: string[];
+          storage_min?: string[];
+          storage_max?: string[];
+          charge_max?: string[];
+          discharge_max?: string[];
+          charge_loss?: string[];
+          discharge_loss?: string[];
+          charge_cost?: string[];
+          discharge_cost?: string[];
+          s0?: string[];
+          general?: string[];
+     };
+     message?: string | null;
+};
+
+export type SolarPanelState = {
+     errors?: {
+          name?: string[];
+          r_max?: string[];
+          delta_r_plus_max?: string[];
+          delta_r_minus_max?: string[];
+          cost?: string[];
+          r0?: string[];
+          shift_start?: string[];
+          exp_v?: string[];
+          range?: string[];
+          value_at_end?: string[];
+          addNoise?: string[];
+          seed?: string[];
           general?: string[];
      };
      message?: string | null;
@@ -31,6 +147,8 @@ export const publicRoutes = [
 export const authRoutes = [
      "/login",
 ];
+
+export const apiAuthRoute = "/api/auth";
 
 export const adminRoute = "/usermanager";
 

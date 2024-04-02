@@ -1,5 +1,6 @@
 "use client";
-import Navbar from "../ui/navbar";
+
+import Navbar from "@/app/ui/navbar";
 import { useEffect } from "react";
 
 

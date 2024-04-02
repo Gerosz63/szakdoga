@@ -1,12 +1,12 @@
 "use server";
 import { revalidatePath } from "next/cache";
 import { exec_query } from "@/app/lib/db";
-import { DbActionResult, UserState, User, GasEngineState, SolarPanel, GasEngine, EnergyStorage, DbNameExchange } from "@/app/lib/definitions";
+import { DbActionResult, UserState, User, GasEngineState, SolarPanel, GasEngine, EnergyStorage, DbNameExchange, EnergyStorageState, SolarPanelState } from "@/app/lib/definitions";
 import { redirect } from "next/navigation";
 import { hash } from "bcrypt";
 import { signIn, signOut } from "@/auth";
 import { AuthError } from "next-auth";
-import { FormModifySchema, FormSchema, GasEngineSchema } from "@/app/lib/schemas";
+import { FormModifySchema, FormSchema, GasEngineSchema, EnergyStorageSchema} from "@/app/lib/schemas";
 import { escape } from "mysql2";
 
 
@@ -226,16 +226,183 @@ export async function deleteGasEngine(id:number) {
      revalidatePath("/simulate"); 
 }
 
+export async function addNewEnergyStorage(uid: number, prevState: EnergyStorageState, formData: FormData) {
+     const validatedData = EnergyStorageSchema.safeParse({
+          name: formData.get("genName"),
+          storage_min: formData.get("storage_min"),
+          storage_max: formData.get("storage_max"),
+          charge_max: formData.get("charge_max"),
+          discharge_max: formData.get("discharge_max"),
+          charge_loss: formData.get("charge_loss"),
+          discharge_loss: formData.get("discharge_loss"),
+          charge_cost: formData.get("charge_cost"),
+          discharge_cost: formData.get("discharge_cost"),
+          s0: formData.get("s0"),
+     });
+
+     if (!validatedData.success) {
+          console.log("Invalid data:")
+          console.log(validatedData.error.flatten().fieldErrors)
+          return {
+               errors: validatedData.error.flatten().fieldErrors,
+               message: 'Hiányos adatok!',
+          };
+     }
+
+     const data = validatedData.data;
+     const q = `INSERT INTO energy_storage (uid, name, storage_min, storage_max, charge_max, discharge_max, charge_loss, discharge_loss, charge_cost, discharge_cost, s0) VALUES (${uid}, ${escape(data.name)}, ${data.storage_min}, ${data.storage_max}, ${data.charge_max}, ${data.discharge_max}, ${data.charge_loss}, ${data.discharge_loss}, ${data.charge_cost}, ${data.discharge_cost}, ${data.s0 === null ? 'NULL' : data.s0})`;
+
+     const res = await exec_query(q);
+     if (!res.success) {
+          console.log(res.message);
+          return {
+               errors: { general: "Adatbázis hiba!" },
+               message: "Adatbázis hiba!"
+          };
+     }
+
+     revalidatePath("/simulate");
+     redirect("/simulate");
+}
+
+export async function modifyEnergyStorage(id: number, prevState: EnergyStorageState, formData: FormData) {
+     const validatedData = EnergyStorageSchema.safeParse({
+          name: formData.get("genName"),
+          storage_min: formData.get("storage_min"),
+          storage_max: formData.get("storage_max"),
+          charge_max: formData.get("charge_max"),
+          discharge_max: formData.get("discharge_max"),
+          charge_loss: formData.get("charge_loss"),
+          discharge_loss: formData.get("discharge_loss"),
+          charge_cost: formData.get("charge_cost"),
+          discharge_cost: formData.get("discharge_cost"),
+          s0: formData.get("s0"),
+     });
+
+     if (!validatedData.success) {
+          console.log("Invalid data:")
+          console.log(validatedData.error.flatten().fieldErrors)
+          return {
+               errors: validatedData.error.flatten().fieldErrors,
+               message: 'Hiányos adatok!',
+          };
+     }
+
+     const data = validatedData.data;
+     const q = `UPDATE energy_storage SET name = ${escape(data.name)}, storage_min = ${data.storage_min}, storage_max = ${data.storage_max}, charge_max = ${data.charge_max}, discharge_max = ${data.discharge_max}, charge_loss = ${data.charge_loss}, discharge_loss = ${data.discharge_loss}, charge_cost = ${data.charge_cost}, discharge_cost = ${data.discharge_cost}, s0 = ${data.s0 === null ? 'NULL' : data.s0} WHERE id = ${id};`;
+
+     const res = await exec_query(q);
+     if (!res.success) {
+          console.log(res.message);
+          return {
+               errors: { general: "Adatbázis hiba!" },
+               message: "Adatbázis hiba!"
+          };
+     }
+
+     revalidatePath("/simulate");
+     redirect("/simulate");
+
+}
+
+export async function deleteEnergyStorage(id:number) {
+     const q = `DELETE FROM energy_storage WHERE id = ${id};`;
+     const res = await exec_query(q);
+     revalidatePath("/simulate"); 
+}
+
+export async function addNewSolarPanel(uid: number, prevState: SolarPanelState, formData: FormData) {
+     const g0 = formData.get("g0") === "" ? null : formData.get("g0");
+     const validatedData = GasEngineSchema.safeParse({
+          name: formData.get("genName"),
+          gmax: formData.get("gmax"),
+          gplusmax: formData.get("gplusmax"),
+          gminusmax: formData.get("gminusmax"),
+          cost: formData.get("cost"),
+          g0: g0,
+     });
+
+     if (!validatedData.success) {
+          console.log("Invalid data:")
+          console.log(validatedData.error.flatten().fieldErrors)
+          return {
+               errors: validatedData.error.flatten().fieldErrors,
+               message: 'Hiányos adatok!',
+          };
+     }
+
+     const data = validatedData.data;
+     const q = `INSERT INTO solar_panel (uid, name, gmax, gplusmax, gminusmax, cost, g0) VALUES (${uid}, ${escape(data.name)}, ${data.gmax}, ${data.gplusmax}, ${data.gminusmax}, ${data.cost}, ${data.g0 === null ? 'NULL' : data.g0})`;
+
+     const res = await exec_query(q);
+     if (!res.success) {
+          console.log(res.message);
+          return {
+               errors: { general: "Adatbázis hiba!" },
+               message: "Adatbázis hiba!"
+          };
+     }
+
+     revalidatePath("/simulate");
+     redirect("/simulate");
+}
+
+export async function modifySolarPanel(id: number, prevState: SolarPanelState, formData: FormData) {
+     const g0 = formData.get("g0") === "" ? null : formData.get("g0");
+     const validatedData = GasEngineSchema.safeParse({
+          name: formData.get("genName"),
+          gmax: formData.get("gmax"),
+          gplusmax: formData.get("gplusmax"),
+          gminusmax: formData.get("gminusmax"),
+          cost: formData.get("cost"),
+          g0: g0,
+     });
+
+     if (!validatedData.success) {
+          console.log("Invalid data:")
+          console.log(validatedData.error.flatten().fieldErrors)
+          return {
+               errors: validatedData.error.flatten().fieldErrors,
+               message: 'Hiányos adatok!',
+          };
+     }
+
+     const data = validatedData.data;
+     const q = `UPDATE solar_panel SET name = ${escape(data.name)}, gmax = ${data.gmax}, gplusmax = ${data.gplusmax}, gminusmax = ${data.gminusmax}, cost = ${data.cost}, g0 = ${data.g0 === null ? 'NULL' : data.g0} WHERE id = ${id};`;
+
+     const res = await exec_query(q);
+     if (!res.success) {
+          console.log(res.message);
+          return {
+               errors: { general: "Adatbázis hiba!" },
+               message: "Adatbázis hiba!"
+          };
+     }
+
+     revalidatePath("/simulate");
+     redirect("/simulate");
+
+}
+
+export async function deleteSolarPanel(id:number) {
+     const q = `DELETE FROM solar_panel WHERE id = ${id};`;
+     const res = await exec_query(q);
+     revalidatePath("/simulate"); 
+}
+
 export async function getGenerators(type: "GAS" | "SOLAR" | "STORE", uid: number) {
      let table = DbNameExchange[type];
      const q = `SELECT * FROM ${table} WHERE uid = ${uid} ORDER BY active DESC;`;
      return await exec_query(q) as DbActionResult<[SolarPanel | GasEngine | EnergyStorage]>;
 }
 
-export async function getGeneratorById(type: "GAS" | "SOLAR" | "STORE", id: number) {
+export async function getGeneratorById(type: "GAS" | "SOLAR" | "STORE", id: number, uid:number) {
      let table = DbNameExchange[type];
-     const q = `SELECT * FROM ${table} WHERE id = ${id};`;
-     return await exec_query(q) as DbActionResult<[SolarPanel | GasEngine | EnergyStorage]>;
+     const q = `SELECT * FROM ${table} WHERE id = ${id} AND (uid = ${uid} OR ${uid} IN (SELECT id FROM user WHERE role = 'admin'));`;
+     const res = await exec_query(q) as DbActionResult<[SolarPanel | GasEngine | EnergyStorage]>;
+     if (res.success && res.result!.length === 0)
+          return {success: false, message: "Nincs ilyen generátor az adatbázisban!", result: null} as DbActionResult<null>;
+     return res;
 }
 
 

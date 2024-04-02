@@ -65,6 +65,40 @@ export const GasEngineNameExchange: GasEngine = {
      g0: "Kezdeti termelés",
 };
 
+export const SolarPanelNameExchange: SolarPanel = {
+     id: 0,
+     uid: 0,
+     name: "",
+     active: false,
+     r_max: "Maximális termelés",
+     delta_r_plus_max: "Maximális felfutási ráta",
+     delta_r_minus_max: "Maximális lefutási ráta",
+     cost: "Költség megtermelt egységenként",
+     r0: "Kezdeti termelés",
+     shift_start: "Eltolás mértéke",
+     exp_v: "Várható érték",
+     range: "Környezet mérete",
+     value_at_end: "Környezet szélén lévő érték",
+     addNoise: "Zaj hozzáadása",
+     seed: "Seed értéke",
+};
+
+export const EnergyStorageNameExchange: EnergyStorage = {
+     id: 0,
+     uid: 0,
+     name: "",
+     active: false,
+     storage_min: "Minimális töltöttségi szint",
+     storage_max: "Maximális töltöttségi szint",
+     charge_max: "Maximális töltés mértéke",
+     discharge_max: "Maximális kisülés mértéke",
+     charge_loss: "Töltési veszteségi együttható",
+     discharge_loss: "Kisülési veszteségi együttható",
+     charge_cost: "Töltés költsége egységenként",
+     discharge_cost: "Kisülés költsége egységenként",
+     s0: "Kezdeti töltöttségi szint",
+};
+
 export type DBSortName = {
      GAS: string,
      SOLAR: string,

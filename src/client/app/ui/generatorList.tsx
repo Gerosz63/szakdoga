@@ -5,7 +5,7 @@ import Element from "./generatorElement";
 import Link from "next/link";
 import { DbActionResult, EnergyStorage, GasEngine, SolarPanel } from "../lib/definitions";
 import { useState } from "react";
-import { deleteGasEngine } from "../lib/actions";
+import { deleteEnergyStorage, deleteGasEngine, deleteSolarPanel } from "../lib/actions";
 
 export default function List({ title, type, elements }: { title: string, type: "GAS" | "SOLAR" | "STORE", elements: DbActionResult<[SolarPanel | GasEngine | EnergyStorage]> }) {
      const [state, setState] = useState({ id: -1, name: "" });
@@ -16,10 +16,10 @@ export default function List({ title, type, elements }: { title: string, type: "
                     deleteGasEngine(state.id);
                     break;
                case "SOLAR":
-
+                    deleteSolarPanel(state.id);
                     break;
                case "STORE":
-
+                    deleteEnergyStorage(state.id);
                     break;
                default:
                     break;

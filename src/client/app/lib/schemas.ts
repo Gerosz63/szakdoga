@@ -80,3 +80,56 @@ export const GasEngineSchema = z.object({
                });
      }
 });
+
+export const EnergyStorageSchema = z.object({
+     name: z.string().max(20, "Maximum 20 karakter hosszú név adható meg!"),
+     storage_min: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).min(0, "A minimális töltöttségi szint legalább 0!"),
+     storage_max: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).min(0, "A maximális töltöttségi szint legalább 0!"),
+     charge_max: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).min(0, "A maximális töltés legalább 0!"),
+     discharge_max: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).min(0, "A maximális kisütés legalább 0!"),
+     charge_loss: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).min(0, "A töltési veszteségi együttható 0.0 és 1.0 közötti érték!").max(1, "A töltési veszteségi együttható 0.0 és 1.0 közötti érték!"),
+     discharge_loss: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).min(0, "A töltési kisütési együttható 0.0 és 1.0 közötti érték!").max(1, "A töltési kisütési együttható 0.0 és 1.0 közötti érték!"),
+     charge_cost: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }),
+     discharge_cost: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }),
+     s0: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }),
+}).superRefine((val, ctx) => {
+     if (val.storage_min > val.storage_max) {
+          ctx.addIssue({
+               code: z.ZodIssueCode.custom,
+               message: "A minimális töltöttségi szint nem lehet több mint a maximális!",
+               path: ["storage_min"]
+          });
+          ctx.addIssue({
+               code: z.ZodIssueCode.custom,
+               message: "A minimális töltöttségi szint nem lehet több mint a maximális!",
+               path: ["storage_max"]
+          });
+     }
+     if (val.storage_min > val.s0) {
+          ctx.addIssue({
+               code: z.ZodIssueCode.custom,
+               message: "A kezdeti töltöttségi szint nem lehet kevesebb mint a minimális!",
+               path: ["storage_min"]
+          });
+          ctx.addIssue({
+               code: z.ZodIssueCode.custom,
+               message: "A kezdeti töltöttségi szint nem lehet kevesebb mint a minimális!",
+               path: ["s0"]
+          });
+     }
+});
+
+export const SolarPanelSchema = z.object({
+     name: z.string().max(20, "Maximum 20 karakter hosszú név adható meg!"),
+     r_max: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).min(0),
+     delta_r_plus_max: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).min(0),
+     delta_r_minus_max: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).min(0),
+     cost: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }),
+     r0: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).min(0),
+     shift_start: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).int("Csak egész szám adható meg!").min(0),
+     exp_v: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }),
+     range: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }),
+     value_at_end: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }),
+     addNoise: z.boolean(),
+     seed: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).int("Csak egész szám adható meg!"),
+});

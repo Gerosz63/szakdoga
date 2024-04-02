@@ -5,11 +5,11 @@ import clsx from "clsx";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useFormState } from "react-dom";
-import { GasEngine } from "../lib/definitions";
+import { GasEngine, GasEngineState } from "../lib/definitions";
 import { useState } from "react";
 
 export default function Form({ action, gasEngine }: { action: "ADD" | "MODIFY", gasEngine?: GasEngine }) {
-     const initialState = { message: null, errors: {} };
+     const initialState : GasEngineState = { message: null, errors: {} };
      const GasEngineWithId = action == "ADD" ? addNewGasEngine.bind(null, +useSession().data?.user.id!) : modifyGasEngine.bind(null, +gasEngine?.id!);
      const [state, dispatch] = useFormState(GasEngineWithId, initialState);
 
@@ -37,7 +37,7 @@ export default function Form({ action, gasEngine }: { action: "ADD" | "MODIFY", 
                     SetGminusmax(false);
                     break;
                case "cost":
-                    SetCost(true);
+                    SetCost(false);
                     break;
                case "g0":
                     SetG0(false);
@@ -59,7 +59,7 @@ export default function Form({ action, gasEngine }: { action: "ADD" | "MODIFY", 
 
 
      return (
-          <form action={dispatch} className="container-fluid mt-2">
+          <form action={dispatch} className="container-fluid">
                <div className="row mb-2">
                     <div className="col-md">
                          <label className="form-label" htmlFor="genName">Név:</label>
@@ -166,6 +166,7 @@ export default function Form({ action, gasEngine }: { action: "ADD" | "MODIFY", 
                     <div className="col-auto">
                          <Link className="btn btn-secondary" href="/simulate">Vissza</Link>
                     </div>
+                    <div className="col"><hr /></div>
                     <div className="col-auto">
                          <button name="submitBtn" onClick={(e) => inputChange(e.currentTarget.name)} className={clsx("btn", { "btn-success": action == "ADD" }, { "btn-warning": action == "MODIFY" })} type="submit">{action == "ADD" ? "Hozzáadás" : "Módosítás"}</button>
                     </div>

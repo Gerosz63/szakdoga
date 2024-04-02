@@ -8,6 +8,7 @@ export default function Page() {
                          <h2>Új gázmotor hozzáadása</h2>
                     </div>
                </div>
+               <hr />
                <div className="row justify-content-center">
                     <div className="col-md-9">
                          <Form action="ADD"/>

@@ -7,6 +7,7 @@ import { addNewEnergyStorage, modifyEnergyStorage } from "@/app/lib/actions";
 import Link from "next/link";
 import clsx from "clsx";
 import { useState } from "react";
+import Element from "./formElement";
 
 
 export default function From({ action, energyStorage }: { action: "ADD" | "MODIFY", energyStorage?: EnergyStorage }) {
@@ -79,20 +80,7 @@ export default function From({ action, energyStorage }: { action: "ADD" | "MODIF
           <form action={dispatch} className="container-fluid">
                <div className="row">
                     <div className="col-md-4 col-lg-6 mt-2">
-                         <label className="form-label" htmlFor="genName">Energia tároló neve:</label>
-                         <input className={clsx("form-control", { "is-invalid": state.errors?.name && nameState, "is-valid": nameState && Object.keys(state.errors ?? {}).length !== 0 && !state.errors?.name })} onClick={(e) => inputChange(e.currentTarget.name)} type="text" name="genName" id="genName" required maxLength={20} defaultValue={energyStorage?.name ?? ""} />
-                         {
-                              (state.errors?.name && nameState) &&
-                              <div className='invalid-feedback'>
-                                   {
-                                        state.errors.name.map((error: string) => (
-                                             <p key={error}>
-                                                  {error}
-                                             </p>
-                                        ))
-                                   }
-                              </div>
-                         }
+                         <Element name="genName" title="Energia tároló neve:" state={state} elemState={nameState} setFunc={SetName} maxLen={20} /> 
                     </div>
                     <div className="col-md-4 col-lg-3 mt-2">
                          <label className="form-label" htmlFor="storage_min">Minimális töltöttségi szint:</label>

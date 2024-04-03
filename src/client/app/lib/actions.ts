@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 import { hash } from "bcrypt";
 import { signIn, signOut } from "@/auth";
 import { AuthError } from "next-auth";
-import { FormModifySchema, FormSchema, GasEngineSchema, EnergyStorageSchema} from "@/app/lib/schemas";
+import { FormModifySchema, FormSchema, GasEngineSchema, EnergyStorageSchema, SolarPanelSchema} from "@/app/lib/schemas";
 import { escape } from "mysql2";
 
 
@@ -28,7 +28,7 @@ export async function addUser(prevState: UserState, formData: FormData) {
      }
 
      const data = dataValidated.data;
-     const qstr = `INSERT INTO user (username, password, role) VALUES ('${data.username}', '${await hash(data.password, 10)}', '${data.role}');`;
+     const qstr = `INSERT INTO user (username, password, role) VALUES (${escape(data.username)}, '${await hash(data.password, 10)}', ${escape(data.role)});`;
      const res = await exec_query(qstr);
      if (!res.success) {
           console.log(res?.message);
@@ -53,7 +53,7 @@ export async function modifyUser(id: number, prevState: UserState, formData: For
           };
      }
      const data = dataValidated.data;
-     const q = `UPDATE user SET username = '${data.username}'${data.password !== null ? ", password = '" + hash(data.password, 10) + "'" : ""}, role = '${data.role}' WHERE id = ${id};`;
+     const q = `UPDATE user SET username = ${escape(data.username)}${data.password !== null ? ", password = '" + hash(data.password, 10) + "'" : ""}, role = ${escape(data.role)} WHERE id = ${id};`;
      const res = await exec_query(q);
      if (!res.success) {
           console.log(res?.message);
@@ -76,7 +76,7 @@ export async function removeUser(id: number) {
 
 
 export async function isUserExists(userId: string | number) {
-     const q = `SELECT id FROM user WHERE ${typeof userId == "number" ? "id = " + userId : "username = '" + userId + "'"}`;
+     const q = `SELECT id FROM user WHERE ${typeof userId == "number" ? "id = " + userId : "username = " + escape(userId)}`;
      const res = await exec_query(q);
      if (!res.success) {
           console.log(res?.message);
@@ -87,7 +87,7 @@ export async function isUserExists(userId: string | number) {
 
 
 export async function listUsers(search: string = "", page: number = 1, limit: number = 10) {
-     const q = `SELECT id, username, role, theme FROM user${search && " WHERE username LIKE '%" + search + "%'"} LIMIT ${(page - 1) * 10},${limit};`;
+     const q = `SELECT id, username, role, theme FROM user${search && " WHERE username LIKE '%" + escape(search).substring(1, escape(search).length - 1) + "%'"} LIMIT ${(page - 1) * 10},${limit};`;
      const res = await exec_query(q);
 
      if (!res.success) {
@@ -114,7 +114,7 @@ export async function getUserById(id: number) {
 }
 
 export async function getUserByName(name: string) {
-     const q = `SELECT id, username, password, role FROM user WHERE username = '${name}';`;
+     const q = `SELECT id, username, password, role FROM user WHERE username = ${escape(name)};`;
      const res = await exec_query(q);
 
      if (!res.success) {
@@ -312,14 +312,20 @@ export async function deleteEnergyStorage(id:number) {
 }
 
 export async function addNewSolarPanel(uid: number, prevState: SolarPanelState, formData: FormData) {
-     const g0 = formData.get("g0") === "" ? null : formData.get("g0");
-     const validatedData = GasEngineSchema.safeParse({
+     const r0 = formData.get("r0") === "" ? null : formData.get("r0");
+     const validatedData = SolarPanelSchema.safeParse({
           name: formData.get("genName"),
-          gmax: formData.get("gmax"),
-          gplusmax: formData.get("gplusmax"),
-          gminusmax: formData.get("gminusmax"),
+          r_max: formData.get("r_max"),
+          delta_r_plus_max: formData.get("delta_r_plus_max"),
+          delta_r_minus_max: formData.get("delta_r_minus_max"),
           cost: formData.get("cost"),
-          g0: g0,
+          r0: r0,
+          shift_start: formData.get("shift_start"),
+          exp_v: formData.get("exp_v"),
+          intval_range: formData.get("intval_range"),
+          value_at_end: formData.get("value_at_end"),
+          addNoise: formData.get("addNoise"),
+          seed: formData.get("seed"),
      });
 
      if (!validatedData.success) {
@@ -332,7 +338,7 @@ export async function addNewSolarPanel(uid: number, prevState: SolarPanelState, 
      }
 
      const data = validatedData.data;
-     const q = `INSERT INTO solar_panel (uid, name, gmax, gplusmax, gminusmax, cost, g0) VALUES (${uid}, ${escape(data.name)}, ${data.gmax}, ${data.gplusmax}, ${data.gminusmax}, ${data.cost}, ${data.g0 === null ? 'NULL' : data.g0})`;
+     const q = `INSERT INTO solar_panel (uid, name, r_max, delta_r_plus_max, delta_r_minus_max, cost, r0, shift_start, exp_v, intval_range, value_at_end, addNoise, seed) VALUES (${uid}, ${escape(data.name)}, ${data.r_max}, ${data.delta_r_plus_max}, ${data.delta_r_minus_max}, ${data.cost}, ${data.r0 === null ? 'NULL' : data.r0}, ${data.shift_start}, ${data.exp_v}, ${data.intval_range}, ${data.value_at_end}, ${data.addNoise == "1" ? "True" : "False"}, ${data.seed});`;
 
      const res = await exec_query(q);
      if (!res.success) {
@@ -348,14 +354,20 @@ export async function addNewSolarPanel(uid: number, prevState: SolarPanelState, 
 }
 
 export async function modifySolarPanel(id: number, prevState: SolarPanelState, formData: FormData) {
-     const g0 = formData.get("g0") === "" ? null : formData.get("g0");
-     const validatedData = GasEngineSchema.safeParse({
+     const r0 = formData.get("r0") === "" ? null : formData.get("r0");
+     const validatedData = SolarPanelSchema.safeParse({
           name: formData.get("genName"),
-          gmax: formData.get("gmax"),
-          gplusmax: formData.get("gplusmax"),
-          gminusmax: formData.get("gminusmax"),
+          r_max: formData.get("r_max"),
+          delta_r_plus_max: formData.get("delta_r_plus_max"),
+          delta_r_minus_max: formData.get("delta_r_minus_max"),
           cost: formData.get("cost"),
-          g0: g0,
+          r0: r0,
+          shift_start: formData.get("shift_start"),
+          exp_v: formData.get("exp_v"),
+          intval_range: formData.get("intval_range"),
+          value_at_end: formData.get("value_at_end"),
+          addNoise: formData.get("addNoise"),
+          seed: formData.get("seed"),
      });
 
      if (!validatedData.success) {
@@ -368,7 +380,7 @@ export async function modifySolarPanel(id: number, prevState: SolarPanelState, f
      }
 
      const data = validatedData.data;
-     const q = `UPDATE solar_panel SET name = ${escape(data.name)}, gmax = ${data.gmax}, gplusmax = ${data.gplusmax}, gminusmax = ${data.gminusmax}, cost = ${data.cost}, g0 = ${data.g0 === null ? 'NULL' : data.g0} WHERE id = ${id};`;
+     const q = `UPDATE solar_panel SET name = ${escape(data.name)}, r_max = ${data.r_max}, delta_r_plus_max = ${data.delta_r_plus_max}, delta_r_minus_max = ${data.delta_r_minus_max}, cost = ${data.cost}, r0 = ${data.r0 === null ? 'NULL' : data.r0}, shift_start = ${data.shift_start}, exp_v = ${data.exp_v}, intval_range = ${data.intval_range}, value_at_end = ${data.value_at_end}, addNoise = ${data.addNoise == "1" ? "True" : "False"}, seed = ${data.seed} WHERE id = ${id};`;
 
      const res = await exec_query(q);
      if (!res.success) {

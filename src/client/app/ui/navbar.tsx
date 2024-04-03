@@ -52,8 +52,8 @@ export default function Navbar() {
                          </ul>
                          <div className="d-flex">
                               <div className="dropdown">
-                                   <button className="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        {user?.name} <FontAwesomeIcon icon={faUser} />
+                                   <button className="btn btn-outline-secondary alig-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <span className="border-end pe-2">{user?.name}</span> <FontAwesomeIcon className="ms-1" icon={faUser} />
                                    </button>
                                    <ul className="dropdown-menu dropdown-menu-end">
                                         <li></li>

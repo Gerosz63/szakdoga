@@ -29,7 +29,7 @@ export type SolarPanel = GeneratorBase & {
      r0: number | string,
      shift_start: number | string,
      exp_v: number | string,
-     range: number | string,
+     intval_range: number | string,
      value_at_end: number | string,
      addNoise: boolean | string,
      seed: number | string,
@@ -76,10 +76,10 @@ export const SolarPanelNameExchange: SolarPanel = {
      cost: "Költség megtermelt egységenként",
      r0: "Kezdeti termelés",
      shift_start: "Eltolás mértéke",
-     exp_v: "Várható érték",
-     range: "Környezet mérete",
+     exp_v: "Maximum helye",
+     intval_range: "Környezet mérete",
      value_at_end: "Környezet szélén lévő érték",
-     addNoise: "Zaj hozzáadása",
+     addNoise: "Zaj:",
      seed: "Seed értéke",
 };
 

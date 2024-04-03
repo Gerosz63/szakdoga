@@ -65,19 +65,25 @@ export const GasEngineSchema = z.object({
      cost: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }),
      g0: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).nullable()
 }).superRefine((arg, ctx) => {
-     if (arg.g0 || arg.g0 === 0) {
+     if (arg.g0) {
           if (arg.g0 < 0)
                ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     message: "A kezdeti termelés nem lehet 0-nál kisebb!",
                     path: ["g0"]
                });
-          else if (arg.g0 > arg.gmax)
+          else if (arg.g0 > arg.gmax) {
                ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     message: "A kezdeti termelés nem lehet a maximális termelésnél nagyobb!",
                     path: ["g0"]
                });
+               ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: "A kezdeti termelés nem lehet a maximális termelésnél nagyobb!",
+                    path: ["gmax"]
+               });
+          }
      }
 });
 
@@ -125,11 +131,32 @@ export const SolarPanelSchema = z.object({
      delta_r_plus_max: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).min(0),
      delta_r_minus_max: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).min(0),
      cost: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }),
-     r0: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).min(0),
+     r0: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).nullable(),
      shift_start: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).int("Csak egész szám adható meg!").min(0),
      exp_v: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }),
-     range: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }),
+     intval_range: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }),
      value_at_end: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }),
-     addNoise: z.boolean(),
+     addNoise: z.enum(["0", "1"]),
      seed: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).int("Csak egész szám adható meg!"),
+}).superRefine((val, ctx) => {
+     if (val.r0) {
+          if (val.r0 > val.r_max) {
+               ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: "A kezdeti termelés értéke nem lehet több mint a maximális!",
+                    path: ["r0"]
+               });
+               ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: "A kezdeti termelés értéke nem lehet több mint a maximális!",
+                    path: ["r_max"]
+               });
+          }
+          if (val.r0 && val.r0 < 0)
+               ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: "A kezdeti termelés értéke nem lehet kevesebb 0-nál!",
+                    path: ["r0"]
+               });
+     }
 });

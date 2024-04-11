@@ -4,7 +4,7 @@ import { useFormState } from 'react-dom';
 import Link from "next/link";
 import { addUser } from "@/app/lib/actions";
 import clsx from 'clsx';
-import { ChangeEvent, useState } from 'react';
+import { useState } from 'react';
 
 
 export default function Form() {
@@ -16,8 +16,7 @@ export default function Form() {
      const [passwordRepState, setPasswordRepState] = useState(true);
      const [roleState, setRoleState] = useState(true);
 
-     function inputChange(event:ChangeEvent<HTMLInputElement>) {
-          console.log("Név: " + event.target.name);
+     function inputChange() {
           switch (event.target.name) {
                case "username":
                     setUserNameState(false);

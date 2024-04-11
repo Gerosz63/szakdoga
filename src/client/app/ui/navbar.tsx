@@ -10,7 +10,7 @@ import { faArrowRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 
 export default function Navbar() {
      const user = useSession().data?.user;
-     
+
      const linkPath = usePathname();
      const links = [
           {
@@ -36,7 +36,9 @@ export default function Navbar() {
      return (
           <nav className="navbar navbar-expand-lg bg-body-tertiary">
                <div className="container-fluid">
-                    <Link className="navbar-brand" href='/home'>Home</Link>
+                    <Link className="navbar-brand" href='/home'>
+                         Home
+                    </Link>
                     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                          <span className="navbar-toggler-icon"></span>
                     </button>
@@ -55,7 +57,7 @@ export default function Navbar() {
                                    <button className="btn btn-outline-secondary alig-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         <span className="border-end pe-2">{user?.name}</span> <FontAwesomeIcon className="ms-1" icon={faUser} />
                                    </button>
-                                   <ul className="dropdown-menu dropdown-menu-end">
+                                   <ul className="dropdown-menu dropdown-menu-lg-end dropdown-menu-start">
                                         <li></li>
                                         <li><Link className="dropdown-item" href="/profile">Profilom</Link></li>
                                         <li><hr className="dropdown-divider" /></li>

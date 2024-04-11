@@ -137,7 +137,7 @@ export const SolarPanelSchema = z.object({
      intval_range: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }),
      value_at_end: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }),
      addNoise: z.enum(["0", "1"]),
-     seed: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).int("Csak egész szám adható meg!"),
+     seed: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).int("Csak egész szám adható meg!").nullable(),
 }).superRefine((val, ctx) => {
      if (val.r0) {
           if (val.r0 > val.r_max) {

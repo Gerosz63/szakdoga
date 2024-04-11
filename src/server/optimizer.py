@@ -121,7 +121,6 @@ class VPPSolarPanel(VPPItem):
         if delta_r_plus_max < 0. or r_max < 0. or delta_r_minus_max < 0. or T < 0:
             raise Exception("A delta_r_plus_max, r_max, delta_r_minus_max, T értékek nem lehetnek 0-nál kisebbek!")
 
-
         self.delta_r_plus_max = delta_r_plus_max
         self.r_max = r_max
         self.delta_r_minus_max = delta_r_minus_max

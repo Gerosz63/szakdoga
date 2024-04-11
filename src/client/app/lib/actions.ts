@@ -1,15 +1,22 @@
 "use server";
 import { revalidatePath } from "next/cache";
 import { exec_query } from "@/app/lib/db";
-import { DbActionResult, UserState, User, GasEngineState, SolarPanel, GasEngine, EnergyStorage, DbNameExchange, EnergyStorageState, SolarPanelState } from "@/app/lib/definitions";
+import { DbActionResult, UserState, User, GasEngineState, SolarPanel, GasEngine, EnergyStorage, DbNameExchange, EnergyStorageState, SolarPanelState, Results, SolverData, Charts } from "@/app/lib/definitions";
 import { redirect } from "next/navigation";
 import { hash } from "bcrypt";
 import { signIn, signOut } from "@/auth";
 import { AuthError } from "next-auth";
-import { FormModifySchema, FormSchema, GasEngineSchema, EnergyStorageSchema, SolarPanelSchema} from "@/app/lib/schemas";
+import { FormModifySchema, FormSchema, GasEngineSchema, EnergyStorageSchema, SolarPanelSchema } from "@/app/lib/schemas";
 import { escape } from "mysql2";
+import { unstable_noStore as noStore } from 'next/cache';
 
 
+/**
+ * Action to add new user to databasethen then revalidating usermanager path and redirect to it.
+ * @param prevState
+ * @param formData
+ * @returns 
+ */
 export async function addUser(prevState: UserState, formData: FormData) {
      const dataValidated = await FormSchema.safeParseAsync({
           username: formData.get("username"),
@@ -37,6 +44,14 @@ export async function addUser(prevState: UserState, formData: FormData) {
      revalidatePath('/usermanager');
      redirect('/usermanager');
 }
+
+/**
+ * Action to modify existing user in database then revalidating usermanager path and redirect to it.
+ * @param id User id
+ * @param prevState 
+ * @param formData 
+ * @returns 
+ */
 export async function modifyUser(id: number, prevState: UserState, formData: FormData) {
      const dataValidated = await FormModifySchema.safeParseAsync({
           id: id,
@@ -63,6 +78,11 @@ export async function modifyUser(id: number, prevState: UserState, formData: For
      redirect('/usermanager');
 }
 
+/**
+ * Action to remove existing user then revalidating usermanager path.
+ * @param id 
+ * @returns 
+ */
 export async function removeUser(id: number) {
      const q = `DELETE FROM user WHERE id = ${id};`;
      const res = await exec_query(q);
@@ -87,6 +107,7 @@ export async function isUserExists(userId: string | number) {
 
 
 export async function listUsers(search: string = "", page: number = 1, limit: number = 10) {
+     noStore();
      const q = `SELECT id, username, role, theme FROM user${search && " WHERE username LIKE '%" + escape(search).substring(1, escape(search).length - 1) + "%'"} LIMIT ${(page - 1) * 10},${limit};`;
      const res = await exec_query(q);
 
@@ -98,7 +119,7 @@ export async function listUsers(search: string = "", page: number = 1, limit: nu
 }
 
 export async function getUserById(id: number) {
-
+     noStore();
      const q = await `SELECT username, role FROM user WHERE id = ${id};`;
      const res = await exec_query(q);
 
@@ -114,6 +135,7 @@ export async function getUserById(id: number) {
 }
 
 export async function getUserByName(name: string) {
+     noStore();
      const q = `SELECT id, username, password, role FROM user WHERE username = ${escape(name)};`;
      const res = await exec_query(q);
 
@@ -144,6 +166,7 @@ export async function login(prevState: string | undefined, formData: FormData) {
      }
 }
 export async function logout() {
+     localStorage.clear();
      await signOut();
 }
 
@@ -220,10 +243,10 @@ export async function modifyGasEngine(id: number, prevState: GasEngineState, for
 
 }
 
-export async function deleteGasEngine(id:number) {
+export async function deleteGasEngine(id: number) {
      const q = `DELETE FROM gas_engines WHERE id = ${id};`;
      const res = await exec_query(q);
-     revalidatePath("/simulate"); 
+     revalidatePath("/simulate");
 }
 
 export async function addNewEnergyStorage(uid: number, prevState: EnergyStorageState, formData: FormData) {
@@ -305,14 +328,15 @@ export async function modifyEnergyStorage(id: number, prevState: EnergyStorageSt
 
 }
 
-export async function deleteEnergyStorage(id:number) {
+export async function deleteEnergyStorage(id: number) {
      const q = `DELETE FROM energy_storage WHERE id = ${id};`;
      const res = await exec_query(q);
-     revalidatePath("/simulate"); 
+     revalidatePath("/simulate");
 }
 
 export async function addNewSolarPanel(uid: number, prevState: SolarPanelState, formData: FormData) {
      const r0 = formData.get("r0") === "" ? null : formData.get("r0");
+     const seed = formData.get("seed") === "" ? null : formData.get("seed");
      const validatedData = SolarPanelSchema.safeParse({
           name: formData.get("genName"),
           r_max: formData.get("r_max"),
@@ -325,7 +349,7 @@ export async function addNewSolarPanel(uid: number, prevState: SolarPanelState, 
           intval_range: formData.get("intval_range"),
           value_at_end: formData.get("value_at_end"),
           addNoise: formData.get("addNoise"),
-          seed: formData.get("seed"),
+          seed: seed,
      });
 
      if (!validatedData.success) {
@@ -355,6 +379,7 @@ export async function addNewSolarPanel(uid: number, prevState: SolarPanelState, 
 
 export async function modifySolarPanel(id: number, prevState: SolarPanelState, formData: FormData) {
      const r0 = formData.get("r0") === "" ? null : formData.get("r0");
+     const seed = formData.get("seed") === "" ? null : formData.get("seed");
      const validatedData = SolarPanelSchema.safeParse({
           name: formData.get("genName"),
           r_max: formData.get("r_max"),
@@ -367,7 +392,7 @@ export async function modifySolarPanel(id: number, prevState: SolarPanelState, f
           intval_range: formData.get("intval_range"),
           value_at_end: formData.get("value_at_end"),
           addNoise: formData.get("addNoise"),
-          seed: formData.get("seed"),
+          seed: seed,
      });
 
      if (!validatedData.success) {
@@ -396,24 +421,26 @@ export async function modifySolarPanel(id: number, prevState: SolarPanelState, f
 
 }
 
-export async function deleteSolarPanel(id:number) {
+export async function deleteSolarPanel(id: number) {
      const q = `DELETE FROM solar_panel WHERE id = ${id};`;
      const res = await exec_query(q);
-     revalidatePath("/simulate"); 
+     revalidatePath("/simulate");
 }
 
 export async function getGenerators(type: "GAS" | "SOLAR" | "STORE", uid: number) {
+     noStore();
      let table = DbNameExchange[type];
      const q = `SELECT * FROM ${table} WHERE uid = ${uid} ORDER BY active DESC;`;
      return await exec_query(q) as DbActionResult<[SolarPanel | GasEngine | EnergyStorage]>;
 }
 
-export async function getGeneratorById(type: "GAS" | "SOLAR" | "STORE", id: number, uid:number) {
+export async function getGeneratorById(type: "GAS" | "SOLAR" | "STORE", id: number, uid: number) {
+     noStore();
      let table = DbNameExchange[type];
      const q = `SELECT * FROM ${table} WHERE id = ${id} AND (uid = ${uid} OR ${uid} IN (SELECT id FROM user WHERE role = 'admin'));`;
      const res = await exec_query(q) as DbActionResult<[SolarPanel | GasEngine | EnergyStorage]>;
      if (res.success && res.result!.length === 0)
-          return {success: false, message: "Nincs ilyen generátor az adatbázisban!", result: null} as DbActionResult<null>;
+          return { success: false, message: "Nincs ilyen generátor az adatbázisban!", result: null } as DbActionResult<null>;
      return res;
 }
 
@@ -425,4 +452,168 @@ export async function changeGeneratorActivity(id: number, val: boolean, type: "G
 
      const res = await exec_query(q);
      revalidatePath("/simulate");
+}
+
+
+export async function simulate(uid: number, demand: number[]) {
+     const db_names = ["gas_engines", "solar_panel", "energy_storage"];
+     const data: SolverData = { demand: demand, generators: { GAS: [], SOLAR: [], STORAGE: [] }, result: [] };
+
+     const [GAS, SOLAR, STORAGE] = await Promise.all(db_names.map(e => {
+          const q = `SELECT * FROM ${e} WHERE uid = ${uid} and active IS TRUE;`;
+          return exec_query(q);
+     }));
+
+     if (!GAS.success || !SOLAR.success || !STORAGE.success) {
+          return { error: "Adatbázi hiba!" };
+     }
+     if (GAS.result.length == 0 &&
+          SOLAR.result.length == 0 &&
+          STORAGE.result.length == 0) {
+          return { error: "Nincs aktív generátor! A szimuláció nem hajtható végre!" };
+     }
+
+     data.generators.GAS = GAS.result;
+     data.generators.SOLAR = SOLAR.result;
+     data.generators.STORAGE = STORAGE.result;
+     console.log(JSON.stringify(data));
+
+     const res = await fetch(new URL(process.env.SOLVER_URL + "?data=" + JSON.stringify(data)))
+     if (!res.ok) {
+          console.log("A szimulátor nem válaszól!");
+          return { error: "A szimulátor nem válaszól!" };
+     }
+
+     const result = await res.json() as { success: boolean, result: number[] };
+
+     if (result.success) {
+          let q = `DELETE FROM results WHERE saved IS FALSE;`;
+          await exec_query(q);
+          data.result = result.result;
+          q = `INSERT INTO results (uid, data) VALUES (${uid}, ${escape(JSON.stringify(data))})`
+          const res = await exec_query(q);
+          if (!res.success) {
+               console.log("Adatbázis hiba!");
+               return { error: "Adatbázi hiba!" };
+          }
+          redirect("/results/show/new");
+     }
+     return { error: "A feladat nem optimalizálható!" };
+}
+
+export async function saveResult(id: number, name: string) {
+     const q = `UPDATE results SET saved = TRUE, name = ${escape(name)} WHERE id = ${id} AND saved IS FALSE;`;
+     const res = await exec_query(q);
+     if (!res.success) {
+          return { success: false, message: "Adatbázis hiba!" };
+     }
+     revalidatePath("/results/show");
+}
+
+export async function deleteResult(id: number) {
+     const q = `DELETE FROM results WHERE id = ${id};`;
+     const res = await exec_query(q);
+     if (!res.success)
+          return { success: false, message: "Adatbázis hiba!" };
+     revalidatePath("/results");
+}
+
+export async function getResults(uid: number) {
+     noStore();
+     const q = `SELECT id, name FROM results WHERE uid = ${uid} AND saved IS TRUE;`;
+     const res = await exec_query(q);
+     if (!res.success) {
+          return { success: false, result: null, message: "Adatbázis hiba!" } as DbActionResult<null>;
+     }
+     else
+          return res as DbActionResult<{ id: number, name: string }[]>;
+}
+
+function createChartData(data: Results) {
+     const charts_data: Charts = {
+          elements: {
+               GAS: [],
+               SOLAR: [],
+               STORAGE: []
+          },
+          sumByType: {
+               GAS: { name: "Gázmotorok", data: [] },
+               SOLAR: { name: "Napelemek", data: [] },
+               STORAGE: {
+                    store: { name: "Töltöttségi szint", data: [] },
+                    charge: { name: "Elraktározott energia", data: [] },
+                    discharge: { name: "Kisütött energia", data: [] },
+                    produce: { name: "Energia tárolók", data: [] },
+               }
+          }
+     }
+
+     const input = JSON.parse(data.data) as SolverData;
+     const T = input.demand.length;
+
+     let start = 0;
+     Object.keys(input.generators).forEach((key) => {
+          input.generators[key as "GAS" | "SOLAR" | "STORAGE"].forEach((e) => {
+               if (key == "STORAGE") {
+                    charts_data.elements.STORAGE.push({
+                         name: e.name,
+                         data: {
+                              store: input.result.slice(start, start + T),
+                              charge: input.result.slice(start + T, start + 2 * T),
+                              discharge: input.result.slice(start + 2 * T, start + 3 * T)
+                         }
+                    });
+               }
+               else {
+                    charts_data.elements[key as "GAS" | "SOLAR"].push({ name: e.name, data: input.result.slice(start, start + T) });
+                    charts_data.elements[key as "GAS" | "SOLAR"].push({ name: e.name, data: input.result.slice(start, start + T) });
+               }
+               start += (key == "STORAGE" ? 3 * T : T);
+          });
+     });
+
+
+     charts_data.sumByType.GAS.data = sumArrayElementsByIndex(charts_data.elements.GAS.map((b) => b.data));
+     charts_data.sumByType.SOLAR.data = sumArrayElementsByIndex(charts_data.elements.SOLAR.map((b) => b.data));
+     charts_data.sumByType.STORAGE.store.data = sumArrayElementsByIndex(charts_data.elements.STORAGE.map((b) => b.data.store));
+     charts_data.sumByType.STORAGE.charge.data = sumArrayElementsByIndex(charts_data.elements.STORAGE.map((b) => b.data.charge));
+     charts_data.sumByType.STORAGE.discharge.data = sumArrayElementsByIndex(charts_data.elements.STORAGE.map((b) => b.data.discharge));
+
+     for (let index = 0; index < charts_data.sumByType.STORAGE.charge.data.length; index++) {
+          charts_data.sumByType.STORAGE.produce.data.push(charts_data.sumByType.STORAGE.discharge.data[index] - charts_data.sumByType.STORAGE.charge.data[index]);
+     }
+
+     return charts_data;
+}
+function sumArrayElementsByIndex(arrays: number[][]) {
+     let res = arrays[0];
+     arrays.slice(1).forEach((e) => {
+          res.forEach((a, i) => {
+               res[i] += a;
+          })
+     })
+     return res;
+}
+export async function getResultById(id: number, uid: number, role: string) {
+     const q = `SELECT * FROM results WHERE id = ${id}${role == "admin" ? "" : ` AND uid = ${uid}`};`;
+     const res = await exec_query(q);
+     if (res.success && res.result.length == 0)
+          return { success: false, result: null, message: "Nincs eredmény!" } as DbActionResult<null>;
+     else if (!res.success)
+          return { success: false, result: null, message: "Adatbázis hiba!" } as DbActionResult<null>;
+
+     res.result = createChartData(res.result[0]);
+     return res as DbActionResult<Charts>;
+}
+
+export async function getNewResult(uid: number) {
+     const q = `SELECT * FROM results WHERE saved IS FALSE AND uid = ${uid} ORDER BY id DESC LIMIT 1;`;
+     const res = await exec_query(q);
+     if (res.success && res.result.length == 0)
+          return { success: false, result: null, message: "Nincs eredmény!" } as DbActionResult<null>;
+     else if (!res.success)
+          return { success: false, result: null, message: "Adatbázis hiba!" } as DbActionResult<null>;
+
+     res.result = createChartData(res.result[0]);
+     return res as DbActionResult<Charts>;
 }

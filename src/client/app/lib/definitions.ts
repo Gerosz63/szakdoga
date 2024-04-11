@@ -47,6 +47,47 @@ export type EnergyStorage = GeneratorBase & {
      s0: number | string,
 };
 
+export type Results = {
+     id: number,
+     uid: number,
+     name: string,
+     data: string,
+     saved: boolean,
+}
+
+export type Charts = {
+     elements: {
+          GAS: { name: string, data: number[] }[],
+          SOLAR: { name: string, data: number[] }[],
+          STORAGE: {
+               name: string, data: {
+                    store: number[],
+                    charge: number[],
+                    discharge: number[],
+               }
+          }[]
+     },
+     sumByType: {
+          GAS: { name: string, data: number[] },
+          SOLAR: { name: string, data: number[] },
+          STORAGE: {
+               store: { name: string, data: number[] },
+               charge: { name: string, data: number[] },
+               discharge: { name: string, data: number[] },
+               produce: { name: string, data: number[] }
+          }
+     }
+};
+
+export type ChartData = {
+     xLabels: number[] | string[],
+     chartdata: {
+          name: string, data: number[]
+     }
+};
+
+
+
 export type DbActionResult<T> = {
      success: boolean,
      result: T | null,
@@ -56,7 +97,7 @@ export type DbActionResult<T> = {
 export const GasEngineNameExchange: GasEngine = {
      id: 0,
      uid: 0,
-     name: "",
+     name: "Gázmotor neve",
      active: false,
      gmax: "Maximális termelés",
      gplusmax: "Maximális felfutási ráta",
@@ -68,7 +109,7 @@ export const GasEngineNameExchange: GasEngine = {
 export const SolarPanelNameExchange: SolarPanel = {
      id: 0,
      uid: 0,
-     name: "",
+     name: "Napelem neve",
      active: false,
      r_max: "Maximális termelés",
      delta_r_plus_max: "Maximális felfutási ráta",
@@ -86,7 +127,7 @@ export const SolarPanelNameExchange: SolarPanel = {
 export const EnergyStorageNameExchange: EnergyStorage = {
      id: 0,
      uid: 0,
-     name: "",
+     name: "Energia tároló neve",
      active: false,
      storage_min: "Minimális töltöttségi szint",
      storage_max: "Maximális töltöttségi szint",
@@ -99,13 +140,23 @@ export const EnergyStorageNameExchange: EnergyStorage = {
      s0: "Kezdeti töltöttségi szint",
 };
 
-export type DBSortName = {
+export type DBShortName = {
      GAS: string,
      SOLAR: string,
      STORE: string
 };
 
-export const DbNameExchange: DBSortName = {
+export type SolverData = {
+     demand: number[],
+     generators: {
+          GAS: GasEngine[],
+          SOLAR: SolarPanel[],
+          STORAGE: EnergyStorage[],
+     },
+     result: number[]
+};
+
+export const DbNameExchange: DBShortName = {
      GAS: "gas_engines",
      SOLAR: "solar_panel",
      STORE: "energy_storage",

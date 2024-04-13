@@ -1,5 +1,5 @@
 "use client";
-import { faPen, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faEye,  faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 
@@ -7,18 +7,22 @@ import Link from "next/link";
 import { useState } from "react";
 import { deleteResult } from "@/app/lib/actions";
 
-export default function List({ results }: { results: { id: number, name: string }[] }) {
+export default function List({ results }: { results: { id: number, name: string, saveDate:Date, exec_time: number }[] }) {
      const [state, SetState] = useState({ id: -1, name: "" });
 
      return (
-          <>
+          <div className="mt-3">
                {
                     results.map((e) =>
-                         <div className="row">
-                              <div className="col">{e.name}</div>
-                              <div className="col-auto input-group">
-                                   <Link className="btn btn-warning" href={`/results/show/${e.id}`}><FontAwesomeIcon icon={faPen} /></Link>
-                                   <button onClick={(a) => SetState({id: e.id, name: e.name})} className="btn btn-danger" data-bs-toggle="modal" data-bs-target="#resultDeleteModal"><FontAwesomeIcon icon={faTrash} /></button>
+                         <div key={e.id} className="fs-5 row justify-content-center border mt-2 rounded py-2 align-items-center shadow">
+                              <div className="col-lg-4 fw-bold">{e.name}</div>
+                              <div className="col-lg-4">{e.saveDate.toISOString().replace("T", " ").replace(".000Z", "")}</div>
+                              <div className="col-lg-2">{e.exec_time}ms</div>
+                              <div className="col-lg-2">
+                                   <div className="input-group justify-content-end">
+                                        <Link className="btn btn-secondary" href={`/results/show/${e.id}`}><FontAwesomeIcon icon={faEye} /></Link>
+                                        <button onClick={(a) => SetState({id: e.id, name: e.name})} className="btn btn-danger" data-bs-toggle="modal" data-bs-target="#resultDeleteModal"><FontAwesomeIcon icon={faTrash} /></button>
+                                   </div>
                               </div>
                          </div>
                     )
@@ -32,11 +36,11 @@ export default function List({ results }: { results: { id: number, name: string 
                               </div>
                               <div className="modal-footer">
                                    <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Vissza</button>
-                                   <button onClick={(e) => deleteResult(state.id)} type="button" className="btn btn-danger">Törlés</button>
+                                   <button onClick={(e) => deleteResult(state.id)} type="button" data-bs-dismiss="modal" className="btn btn-danger">Törlés</button>
                               </div>
                          </div>
                     </div>
                </div>
-          </>
+          </div>
      );
 }

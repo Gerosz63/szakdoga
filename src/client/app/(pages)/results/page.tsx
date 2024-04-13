@@ -11,7 +11,7 @@ export default async function Page() {
      return (
           <div className="container-fluid">
                <div className="row">
-                    <div className="col">
+                    <div className="col text-center">
                          <h1>Eredmények</h1>
                     </div>
                </div>

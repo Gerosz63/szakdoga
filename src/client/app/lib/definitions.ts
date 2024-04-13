@@ -51,11 +51,29 @@ export type Results = {
      id: number,
      uid: number,
      name: string,
+     saveDate: Date,
      data: string,
      saved: boolean,
+     exec_time: number
 }
 
 export type Charts = {
+     id: number,
+     name: string,
+     labels: number[],
+     demand: number[],
+     generators: {
+          GAS: GasEngine[],
+          SOLAR: SolarPanel[],
+          STORAGE: EnergyStorage[],
+     },
+     exec_time: number,
+     saveDate: Date,
+     elementTypes: {
+          GAS: boolean,
+          SOLAR: boolean,
+          STORAGE: boolean,
+     },
      elements: {
           GAS: { name: string, data: number[] }[],
           SOLAR: { name: string, data: number[] }[],
@@ -80,10 +98,14 @@ export type Charts = {
 };
 
 export type ChartData = {
-     xLabels: number[] | string[],
+     xLabels: number[],
      chartdata: {
           name: string, data: number[]
-     }
+     }[]
+     demand?: number[],
+     store?: {
+          name: string, data: number[]
+     }[]
 };
 
 

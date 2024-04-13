@@ -1,24 +1,27 @@
 import { getGenerators } from "@/app/lib/actions";
 import List from "@/app/ui/generatorList";
-import DemandManager from "@/app/ui/potentialDemandManager";
+import DemandManager from "@/app/ui/demandManager";
 import ListSkeleton from "@/app/ui/skeletons/generatorListSkeleton";
 import { auth } from "@/auth";
 import { Suspense } from "react";
+import { cookies } from "next/headers";
 
 export default async function Page() {
+     const mycookie = cookies();
+     const localDemand = mycookie.get("demand")?.value ?? "";
      const user = await auth();
      const gasEngines = await getGenerators("GAS", +user?.user.id!);
      const solarPanels = await getGenerators("SOLAR", +user?.user.id!);
      const energyStorages = await getGenerators("STORE", +user?.user.id!);
-     const session = await auth();
      return (
           <div className="container-fluid">
                <h2 className="text-center mt-3 mb-5">Virtuális erőmű szimulátor</h2>
-               <div className="row">
+               <div className="row mb-3">
                     <div className="col">
-                         <DemandManager uid={+session?.user.id!}/>
+                         <DemandManager uid={+user?.user.id!} localDemand={localDemand}/>
                     </div>
                </div>
+               <h3>Erőműveid</h3>
                <hr />
                <div className="row gx-2">
                     <div className="col-md-4">

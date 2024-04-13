@@ -29,6 +29,6 @@ def get_results():
     res = solve(items, demand_.size, demand_, np.zeros_like(demand_))
     print("\n=============================================\n", res, "\n=============================================\n")
     if (res[0]):
-        return json.dumps({"success": True, "result": res[1].x.tolist()})
+        return json.dumps({"success": True, "result": res[1].x.tolist(), "exec_time": res[3] * 1000})
     
-    return json.dumps({"success": False, "result": []})
+    return json.dumps({"success": False, "result": [], "exec_time": 0})

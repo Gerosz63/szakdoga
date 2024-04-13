@@ -6,11 +6,19 @@ import { useEffect, useState } from "react";
 import clsx from "clsx";
 import { useDebouncedCallback } from 'use-debounce';
 import { z } from "zod";
-import { simulate } from "@/app/lib/actions";
+import { SetDemandInCookie, simulate } from "@/app/lib/actions";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { LineChart } from "@mui/x-charts";
+import ErrorAlert from "./errorAlerts";
 
-export default function DemandManager({ uid }: { uid: number }) {
-     const localDemand = localStorage.getItem("demand") ?? "";
+
+export default function DemandManager({ uid, localDemand }: { uid: number, localDemand:string }) {
+     
      const [demandState, SetDemand] = useState({ value: [] as number[], state: localDemand === "", error: [] as string[] });
+     const [btnState, SetBtnState] = useState(false);
+     const [simState, SetSimState] = useState({success:true, message: ""});
+
+
      useEffect(() => {
           if (localDemand !== "")
                onChangeHandler(localDemand);
@@ -25,7 +33,7 @@ export default function DemandManager({ uid }: { uid: number }) {
 
           if (res.success) {
                SetDemand({ value: res.data, state: false, error: [] });
-               localStorage.setItem("demand", rawval)
+               SetDemandInCookie(rawval);
           }
           else {
                let error_: { "Csak számok adhatók meg!": number[], "Csak nemnegatív számok adhatók meg!": number[] } = { "Csak számok adhatók meg!": [], "Csak nemnegatív számok adhatók meg!": [] };
@@ -40,10 +48,12 @@ export default function DemandManager({ uid }: { uid: number }) {
 
      }, 300);
 
-     function simulateOnclickHandler() {
+     async function simulateOnclickHandler() {
           if (demandState.state)
                return;
-          simulate(uid, demandState.value);
+          const res = await simulate(uid, demandState.value);
+          
+          SetSimState({success: false, message: res.error});
      }
 
      return (
@@ -60,25 +70,48 @@ export default function DemandManager({ uid }: { uid: number }) {
                               Új várható fogyasztás adatait pontosvesszővel, szóközök nélkül írd az alábbi mezőbe! (Pl.: "1200;1350.2;1500")
                          </div>
                     </div>
-                    <div className="row">
-                         <input onChange={(e) => onChangeHandler(e.target.value)} className={clsx(("col form-control"), { "is-invalid": demandState.state && demandState.error.length !== 0, "is-valid": !demandState.state })} type="text" name="demand" id="demand" placeholder="1200;1350.2;1500" defaultValue={localDemand} />
-                         {
-                              (demandState.state && demandState.error.length !== 0) &&
-                              <div className='invalid-feedback'>
-                                   {
-                                        demandState.error.map((e) =>
-                                             <p>{e}</p>
-                                        )
-                                   }
-                              </div>
-                         }
+                    <div className="row g-2">
+                         <div className="col">
+                              <input onChange={(e) => onChangeHandler(e.target.value)} className={clsx(("form-control"), { "is-invalid": demandState.state && demandState.error.length !== 0, "is-valid": !demandState.state })} type="text" name="demand" id="demand" placeholder="1200;1350.2;1500" defaultValue={localDemand} />
+                              {
+                                   (demandState.state && demandState.error.length !== 0) &&
+                                   <div className='invalid-feedback'>
+                                        {
+                                             demandState.error.map((e) =>
+                                                  <p>{e}</p>
+                                             )
+                                        }
+                                   </div>
+                              }
+                         </div>
+                         <div className="col-auto">
+                              <button data-bs-toggle="collapse" data-bs-target="#collapseDemand" aria-expanded="false" aria-controls="collapseDemand" onClick={e => SetBtnState(!btnState)} className={clsx("btn", { "btn-secondary": btnState, "btn-outline-secondary": !btnState })} type="button"><FontAwesomeIcon icon={!btnState ? faEye : faEyeSlash} /></button>
+                         </div>
+                    </div>
+                    <div className="row justify-content-center collapse" id="collapseDemand">
+                         <div className="col-9" style={{ height: "300px" }}>
+                              <LineChart
+                                   series={[
+                                             {data: demandState.value, label: "Fogyasztás", curve: "step"}
+                                        ]}
+                                   xAxis={[
+                                        { data: Array.from(Array(demandState.value.length).keys()) as number[], scaleType: "point", label: "Idő intervallum" }
+                                   ]}
+                                   yAxis={[
+                                        { label: "Fogyaztás mértéke", min: 0, max: Math.max(...demandState.value) * 1.1, position: "left" }]}
+                              />
+                         </div>
                     </div>
                </div>
-               <div className="row position-fixed bottom-0 end-50 mb-5" tabIndex={-1}>
+               <div className="row position-fixed bottom-0 w-100 mb-5 justify-content-center" tabIndex={-1}>
                     <div className="col-auto">
                          <button disabled={demandState.state} onClick={(e) => simulateOnclickHandler()} type="button" className="btn btn-lg btn-success shadow">Szimulál</button>
                     </div>
                </div>
+               {
+                    !simState.success &&
+                    <ErrorAlert text={simState.message} callback={SetSimState}/>
+               }
           </>
      );
 }

@@ -1,15 +1,15 @@
 "use client";
 
 import { SolarPanel, SolarPanelState } from "@/app/lib/definitions";
-import { addNewSolarPanel, modifySolarPanel } from "../lib/actions";
+import { addNewSolarPanel, modifySolarPanel } from "@/app/lib/actions";
 import { useSession } from "next-auth/react";
 import { useFormState } from "react-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 import clsx from "clsx";
 import { useState } from "react";
-import Element from "./formElement";
-import Submit from "./formSubmitElement";
+import Element from "@/app/ui/formElement";
+import Submit from "@/app/ui/formSubmitElement";
 
 export default function Form({ action, solarPanel }: { action: "ADD" | "MODIFY", solarPanel?: SolarPanel }) {
 

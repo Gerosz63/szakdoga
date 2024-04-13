@@ -9,6 +9,8 @@ import { AuthError } from "next-auth";
 import { FormModifySchema, FormSchema, GasEngineSchema, EnergyStorageSchema, SolarPanelSchema } from "@/app/lib/schemas";
 import { escape } from "mysql2";
 import { unstable_noStore as noStore } from 'next/cache';
+import { z } from "zod";
+import { cookies } from "next/headers";
 
 
 /**
@@ -152,7 +154,9 @@ export async function getUserByName(name: string) {
 
 export async function login(prevState: string | undefined, formData: FormData) {
      try {
-          await signIn("credentials", formData)
+          await signIn("credentials", formData);
+          const mycookie = cookies();
+          mycookie.delete("demand");
      } catch (error) {
           if (error instanceof AuthError) {
                switch (error.type) {
@@ -166,8 +170,14 @@ export async function login(prevState: string | undefined, formData: FormData) {
      }
 }
 export async function logout() {
-     localStorage.clear();
+     const mycookie = cookies();
+     mycookie.delete("demand");
      await signOut();
+}
+
+export async function SetDemandInCookie(data:string) {
+     const mycookie = cookies();
+     mycookie.set("demand", data);
 }
 
 export async function addNewGasEngine(uid: number, prevState: GasEngineState, formData: FormData) {
@@ -476,7 +486,7 @@ export async function simulate(uid: number, demand: number[]) {
      data.generators.GAS = GAS.result;
      data.generators.SOLAR = SOLAR.result;
      data.generators.STORAGE = STORAGE.result;
-     console.log(JSON.stringify(data));
+
 
      const res = await fetch(new URL(process.env.SOLVER_URL + "?data=" + JSON.stringify(data)))
      if (!res.ok) {
@@ -484,13 +494,13 @@ export async function simulate(uid: number, demand: number[]) {
           return { error: "A szimulátor nem válaszól!" };
      }
 
-     const result = await res.json() as { success: boolean, result: number[] };
+     const result = await res.json() as { success: boolean, result: number[], exec_time: number };
 
      if (result.success) {
           let q = `DELETE FROM results WHERE saved IS FALSE;`;
           await exec_query(q);
           data.result = result.result;
-          q = `INSERT INTO results (uid, data) VALUES (${uid}, ${escape(JSON.stringify(data))})`
+          q = `INSERT INTO results (uid, data, exec_time, saveDate) VALUES (${uid}, ${escape(JSON.stringify(data))}, ${result.exec_time}, NOW());`;
           const res = await exec_query(q);
           if (!res.success) {
                console.log("Adatbázis hiba!");
@@ -501,13 +511,23 @@ export async function simulate(uid: number, demand: number[]) {
      return { error: "A feladat nem optimalizálható!" };
 }
 
-export async function saveResult(id: number, name: string) {
-     const q = `UPDATE results SET saved = TRUE, name = ${escape(name)} WHERE id = ${id} AND saved IS FALSE;`;
+
+export async function saveResults(id: number, prevState: { message: string | null, error: string[] | null}, formData: FormData) {
+     
+     const validatedName = z.string().max(50, "A név hossza maximum 50 karakter lehet!").nullable().safeParse(formData.get("resName"));
+     
+     if (!validatedName.success) {
+          console.log(validatedName.error.flatten().formErrors);
+          return { message: "Hiba!", error: validatedName.error.flatten().formErrors };
+     }
+
+     const q = `UPDATE results SET saved = TRUE, name = ${escape(validatedName.data)} WHERE id = ${id} AND saved IS FALSE;`;
      const res = await exec_query(q);
      if (!res.success) {
-          return { success: false, message: "Adatbázis hiba!" };
+          return { message: "Hiba!", error: ["Adatbázis hiba!"] };
      }
-     revalidatePath("/results/show");
+     revalidatePath("/results");
+     redirect(`/results/show/${id}`);
 }
 
 export async function deleteResult(id: number) {
@@ -520,17 +540,33 @@ export async function deleteResult(id: number) {
 
 export async function getResults(uid: number) {
      noStore();
-     const q = `SELECT id, name FROM results WHERE uid = ${uid} AND saved IS TRUE;`;
+     const q = `SELECT id, name, saveDate, exec_time FROM results WHERE uid = ${uid} AND saved IS TRUE;`;
      const res = await exec_query(q);
      if (!res.success) {
           return { success: false, result: null, message: "Adatbázis hiba!" } as DbActionResult<null>;
      }
      else
-          return res as DbActionResult<{ id: number, name: string }[]>;
+          return res as DbActionResult<{ id: number, name: string, saveDate: Date, exec_time:number }[]>;
 }
 
-function createChartData(data: Results) {
+async function createChartData(data: Results) {
      const charts_data: Charts = {
+          id: data.id,
+          name: data.name,
+          exec_time: data.exec_time,
+          saveDate: data.saveDate,
+          demand: [],
+          generators: {
+               GAS: [],
+               SOLAR: [],
+               STORAGE: [],
+          },
+          elementTypes: {
+               GAS: false,
+               SOLAR: false,
+               STORAGE: false,
+          },
+          labels: [],
           elements: {
                GAS: [],
                SOLAR: [],
@@ -549,8 +585,16 @@ function createChartData(data: Results) {
      }
 
      const input = JSON.parse(data.data) as SolverData;
-     const T = input.demand.length;
+     charts_data.demand = input.demand;
 
+     charts_data.generators = input.generators;
+
+     charts_data.elementTypes.GAS = input.generators.GAS.length != 0;
+     charts_data.elementTypes.SOLAR = input.generators.SOLAR.length != 0;
+     charts_data.elementTypes.STORAGE = input.generators.STORAGE.length != 0;
+
+     const T = input.demand.length;
+     charts_data.labels = Array.from(Array(T + 1).keys());
      let start = 0;
      Object.keys(input.generators).forEach((key) => {
           input.generators[key as "GAS" | "SOLAR" | "STORAGE"].forEach((e) => {
@@ -566,34 +610,44 @@ function createChartData(data: Results) {
                }
                else {
                     charts_data.elements[key as "GAS" | "SOLAR"].push({ name: e.name, data: input.result.slice(start, start + T) });
-                    charts_data.elements[key as "GAS" | "SOLAR"].push({ name: e.name, data: input.result.slice(start, start + T) });
                }
                start += (key == "STORAGE" ? 3 * T : T);
           });
      });
 
+     if (charts_data.elementTypes.GAS)
+          charts_data.sumByType.GAS.data = await sumArrayElementsByIndex(charts_data.elements.GAS.map((b) => b.data));
 
-     charts_data.sumByType.GAS.data = sumArrayElementsByIndex(charts_data.elements.GAS.map((b) => b.data));
-     charts_data.sumByType.SOLAR.data = sumArrayElementsByIndex(charts_data.elements.SOLAR.map((b) => b.data));
-     charts_data.sumByType.STORAGE.store.data = sumArrayElementsByIndex(charts_data.elements.STORAGE.map((b) => b.data.store));
-     charts_data.sumByType.STORAGE.charge.data = sumArrayElementsByIndex(charts_data.elements.STORAGE.map((b) => b.data.charge));
-     charts_data.sumByType.STORAGE.discharge.data = sumArrayElementsByIndex(charts_data.elements.STORAGE.map((b) => b.data.discharge));
+     if (charts_data.elementTypes.SOLAR)
+          charts_data.sumByType.SOLAR.data = await sumArrayElementsByIndex(charts_data.elements.SOLAR.map((b) => b.data));
 
-     for (let index = 0; index < charts_data.sumByType.STORAGE.charge.data.length; index++) {
-          charts_data.sumByType.STORAGE.produce.data.push(charts_data.sumByType.STORAGE.discharge.data[index] - charts_data.sumByType.STORAGE.charge.data[index]);
+     if (charts_data.elementTypes.STORAGE) {
+          charts_data.sumByType.STORAGE.store.data = await sumArrayElementsByIndex(charts_data.elements.STORAGE.map((b) => b.data.store));
+          charts_data.sumByType.STORAGE.charge.data = await sumArrayElementsByIndex(charts_data.elements.STORAGE.map((b) => b.data.charge));
+          charts_data.sumByType.STORAGE.discharge.data = await sumArrayElementsByIndex(charts_data.elements.STORAGE.map((b) => b.data.discharge));
+
+          for (let index = 0; index < charts_data.sumByType.STORAGE.charge.data.length; index++)
+               charts_data.sumByType.STORAGE.produce.data.push(charts_data.sumByType.STORAGE.discharge.data[index] - charts_data.sumByType.STORAGE.charge.data[index]);
      }
 
      return charts_data;
 }
-function sumArrayElementsByIndex(arrays: number[][]) {
+
+export async function sumArrayElementsByIndex(arrays: number[][]) {
      let res = arrays[0];
+     if (arrays.length == 1)
+          return res;
+
      arrays.slice(1).forEach((e) => {
-          res.forEach((a, i) => {
+
+          e.forEach((a, i) => {
                res[i] += a;
           })
-     })
+     });
+
      return res;
 }
+
 export async function getResultById(id: number, uid: number, role: string) {
      const q = `SELECT * FROM results WHERE id = ${id}${role == "admin" ? "" : ` AND uid = ${uid}`};`;
      const res = await exec_query(q);
@@ -602,7 +656,7 @@ export async function getResultById(id: number, uid: number, role: string) {
      else if (!res.success)
           return { success: false, result: null, message: "Adatbázis hiba!" } as DbActionResult<null>;
 
-     res.result = createChartData(res.result[0]);
+     res.result = await createChartData(res.result[0]);
      return res as DbActionResult<Charts>;
 }
 
@@ -614,6 +668,6 @@ export async function getNewResult(uid: number) {
      else if (!res.success)
           return { success: false, result: null, message: "Adatbázis hiba!" } as DbActionResult<null>;
 
-     res.result = createChartData(res.result[0]);
+     res.result = await createChartData(res.result[0]);
      return res as DbActionResult<Charts>;
 }

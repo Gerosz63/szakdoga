@@ -32,7 +32,7 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
                          const { username, password } = parsedCredentials.data;
                          const user = await getUserByName(username);
                          if (!user.success)
-                              return null;
+                              throw new Error("Adatbázis hiba!");
 
                          const passwordMatch = await compare(password, user.result?.password!);
                          if (passwordMatch) {

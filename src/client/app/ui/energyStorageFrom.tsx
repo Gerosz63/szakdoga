@@ -67,7 +67,7 @@ export default function From({ action, energyStorage }: { action: "ADD" | "MODIF
                </div>
                <div className="row">
                     <div className="col-md-4 col-lg-3 mt-2">
-                         <Element name={"charge_cost" as keyof EnergyStorage} type="STORAGE"state={state as EnergyStorageState} elemState={charge_costState} setFunc={SetCharge_cost} required defaultValue={energyStorage?.charge_cost} />
+                         <Element name={"charge_cost" as keyof EnergyStorage} type="STORAGE" state={state as EnergyStorageState} elemState={charge_costState} setFunc={SetCharge_cost} required defaultValue={energyStorage?.charge_cost} />
                     </div>
                     <div className="col-md-4 col-lg-3 mt-2">
                          <Element name={"discharge_cost" as keyof EnergyStorage} type="STORAGE" state={state as EnergyStorageState} elemState={discharge_costState} setFunc={SetDischarge_cost} required defaultValue={energyStorage?.discharge_cost} />
@@ -77,6 +77,20 @@ export default function From({ action, energyStorage }: { action: "ADD" | "MODIF
                     </div>
                </div>
                <Submit action={action} href="/simulate" inputChange={inputChange} />
+               {
+                    state.errors.general &&
+                    <div className="start-0 bottom-0 position-fixed w-100 row ps-3" tabIndex={-2}>
+                         <div className="col">
+                              {
+                                   state.errors.general.map((error: string) => (
+                                        <div role='alert' className="alert alert-danger mt-4" key={error}>
+                                             {error}
+                                        </div>
+                                   ))
+                              }
+                         </div>
+                    </div>
+               }
           </form>
      );
 }

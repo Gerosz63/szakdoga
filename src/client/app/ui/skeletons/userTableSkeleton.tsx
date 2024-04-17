@@ -1,64 +1,29 @@
 
 export default function UserTableSkeleton() {
      return (
-          <>
-               <table className="table table-striped">
-                    <thead>
-                         <tr>
-                              <th>Felhasználónév</th>
-                              <th>Szerepkör</th>
-                              <th>Téma</th>
-                              <th></th>
-                         </tr>
-                    </thead>
-                    <tbody>
-                         <tr>
-                              <td><span className="placeholder w-75"></span></td>
-                              <td><span className="placeholder w-50"></span></td>
-                              <td><span className="placeholder w-25"></span></td>
-                              <td>
-                                   <a className="btn btn-warning disabled placeholder" aria-disabled="true"></a>
-                                   <a className="btn btn-danger disabled placeholder" aria-disabled="true"></a>
-                              </td>
-                         </tr>
-                         <tr>
-                              <td><span className="placeholder w-75"></span></td>
-                              <td><span className="placeholder w-50"></span></td>
-                              <td><span className="placeholder w-25"></span></td>
-                              <td>
-                                   <a className="btn btn-warning disabled placeholder" aria-disabled="true"></a>
-                                   <a className="btn btn-danger disabled placeholder" aria-disabled="true"></a>
-                              </td>
-                         </tr>
-                         <tr>
-                              <td><span className="placeholder w-50"></span></td>
-                              <td><span className="placeholder w-50"></span></td>
-                              <td><span className="placeholder w-25"></span></td>
-                              <td>
-                                   <a className="btn btn-warning disabled placeholder" aria-disabled="true"></a>
-                                   <a className="btn btn-danger disabled placeholder" aria-disabled="true"></a>
-                              </td>
-                         </tr>
-                         <tr>
-                              <td><span className="placeholder w-50"></span></td>
-                              <td><span className="placeholder w-50"></span></td>
-                              <td><span className="placeholder w-25"></span></td>
-                              <td>
-                                   <a className="btn btn-warning disabled placeholder" aria-disabled="true"></a>
-                                   <a className="btn btn-danger disabled placeholder" aria-disabled="true"></a>
-                              </td>
-                         </tr>
-                         <tr>
-                              <td><span className="placeholder w-100"></span></td>
-                              <td><span className="placeholder w-50"></span></td>
-                              <td><span className="placeholder w-25"></span></td>
-                              <td>
-                                   <a className="btn btn-warning disabled placeholder" aria-disabled="true"></a>
-                                   <a className="btn btn-danger disabled placeholder" aria-disabled="true"></a>
-                              </td>
-                         </tr>
-                    </tbody>
-               </table>
-          </>
+          <div className="container-fluid mb-4">
+               <div className="row">
+                    <div className="col-5 fw-bold">
+                         Felhasználónév
+                    </div>
+                    <div className="col-3 fw-bold">
+                         Szerepkör
+                    </div>
+                    <div className="col-1 fw-bold text-center">
+                         Téma
+                    </div>
+               </div>
+               <div className="row border rounded-4 shadow my-2 px-2 py-2 align-items-center placeholder-glow">
+                    <div className="col-5 placeholder"></div>
+                    <div className="col-3 placeholder"></div>
+                    <div className="col-1 placeholder fs-4 text-center justify-content-center"></div>
+                    <div className="col-3 placeholder">
+                         <div className="input-group justify-content-end">
+                              <button className="btn btn-warning placeholder" type="button"></button>
+                              <button className="btn btn-danger placeholder" type="button"></button>
+                         </div>
+                    </div>
+               </div>
+          </div>
      );
 }

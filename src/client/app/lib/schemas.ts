@@ -8,7 +8,7 @@ export const FormModifySchema = z.object({
      role: z.enum(["admin", "user"]),
 }).superRefine(async (val, ctx) => {
      const userId = await isUserExists(val.id);
-     if (!userId.success || !userId.result) {
+     if (userId.success && !userId.result) {
           ctx.addIssue({
                code: z.ZodIssueCode.custom,
                message: "A módosítandó felhasználó nem létezik!",
@@ -18,7 +18,7 @@ export const FormModifySchema = z.object({
      else {
           const user = await getUserById(val.id);
           const userExists = await isUserExists(val.username);
-          if (!user.success || !userExists.success || (user.result!.username != val.username && userExists.result)) {
+          if (user.success && userExists.success && (user.result!.username != val.username && userExists.result)) {
                ctx.addIssue({
                     code: z.ZodIssueCode.custom,
                     message: "A felhasználónév már foglalat",
@@ -47,7 +47,7 @@ export const FormSchema = z.object({
           });
      }
      const user = await isUserExists(data.username);
-     if (!user.success || user.result) {
+     if (user.success && user.result) {
           ctx.addIssue({
                code: z.ZodIssueCode.custom,
                message: "A felhasználónév már foglalat",

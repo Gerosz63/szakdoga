@@ -4,7 +4,6 @@ import UserTableSkeleton from "@/app/ui/skeletons/userTableSkeleton";
 import Table from "@/app/ui/userTable";
 import Search from "@/app/ui/userSearch";
 import { listUsers } from "@/app/lib/actions";
-import { DbActionResult, User } from "@/app/lib/definitions";
 
 
 

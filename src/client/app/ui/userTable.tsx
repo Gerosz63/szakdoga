@@ -7,38 +7,62 @@ import { faMoon } from "@fortawesome/free-regular-svg-icons";
 import { useState } from "react";
 import { removeUser } from "@/app/lib/actions";
 
-export default function Table({users}: {users:DbActionResult<[User]> | DbActionResult<null>}) {
-     const [state, setState] = useState({username:"", id:-1});
+export default function Table({ users }: { users: DbActionResult<User[]> | DbActionResult<null> }) {
+     const [state, setState] = useState({ username: "", id: -1 });
 
      return (
           <>
-               <table className="table table-striped">
-                    <thead>
-                         <tr>
-                              <th>Felhasználónév</th>
-                              <th>Szerepkör</th>
-                              <th>Téma</th>
-                              <th></th>
-                         </tr>
-                    </thead>
-                    <tbody>
-                         {
-                              users?.success ? users.result!.map((e) => 
-                                   <tr key={e.id}>
-                                        <td>{e.username}</td>
-                                        <td>{e.role}</td>
-                                        <td className="fs-4">{e.theme == "light" ? <FontAwesomeIcon className="text-warning" icon={faSun} /> : <FontAwesomeIcon className="text-dark" icon={faMoon} />}</td>
-                                        <td>
-                                             <Link href={`/usermanager/${e.id}/modify`} className="btn btn-warning" type="button"><FontAwesomeIcon icon={faPen} /></Link>
-                                             <button data-bs-toggle="modal" data-bs-target="#deleteModal" onClick={(a) => setState({username: e.username, id: e.id!})} className="btn btn-danger" type="button"><FontAwesomeIcon icon={faTrash} /></button>
-                                        </td>
-                                   </tr>
-                              
-                              ) : <tr><td className="text-center" colSpan={4}>Nincs találat!</td></tr>
-                              
-                         }
-                    </tbody>
-               </table>
+               <div className="container-fluid mb-4">
+                    <div className="row">
+                         <div className="col-5 fw-bold">
+                              Felhasználónév
+                         </div>
+                         <div className="col-3 fw-bold">
+                              Szerepkör
+                         </div>
+                         <div className="col-1 fw-bold text-center">
+                              Téma
+                         </div>
+                    </div>
+                    {
+                         users?.success &&
+                         users!.result?.map(e => {
+                              return (
+                                   <div key={e.id} className="row border rounded-4 shadow my-2 px-2 py-2 align-items-center">
+                                        <div className="col-5">
+                                             {e.username}
+                                        </div>
+                                        <div className="col-3">
+                                             {e.role}
+                                        </div>
+                                        <div className="col-1 fs-4 text-center justify-content-center">
+                                             {<FontAwesomeIcon className="text-warning" icon={e.theme == "light" ? faSun : faMoon} />}
+                                        </div>
+                                        <div className="col-3">
+                                             <div className="input-group justify-content-end">
+                                                  <Link href={`/usermanager/${e.id}/modify`} className="btn btn-warning" type="button"><FontAwesomeIcon icon={faPen} /></Link>
+                                                  <button data-bs-toggle="modal" data-bs-target="#deleteModal" onClick={(a) => setState({ username: e.username, id: e.id! })} className="btn btn-danger" type="button"><FontAwesomeIcon icon={faTrash} /></button>
+                                             </div>
+                                        </div>
+                                   </div>
+                              );
+                         })
+                    }
+                    {
+                         (users.success && users.result!.length == 0) &&
+                         <div className="row border rounded-4 shadow my-2 px-2 py-2 align-items-center">
+                              <div className="col text-center">
+                                   Nincs találat...
+                              </div>
+                         </div>
+                    }
+                    {
+                         !users.success &&
+                         <div className="bottom-0 start-0 position-fixed w-100 px-2" tabIndex={-2}>
+                              <div role="alert" className="alert alert-danger">{users.message!}</div>
+                         </div>
+                    }
+               </div>
                <div id="deleteModal" className="modal" tabIndex={-1}>
                     <div className="modal-dialog">
                          <div className="modal-content">

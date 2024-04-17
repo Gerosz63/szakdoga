@@ -117,7 +117,7 @@ export async function listUsers(search: string = "", page: number = 1, limit: nu
           console.log(res?.message);
           return { message: "Adatbázis hiba.", success: false, result: null } as DbActionResult<null>;
      }
-     return { success: true, result: res.result as Array<User> } as DbActionResult<[User]>;
+     return { success: true, result: res.result as Array<User> } as DbActionResult<User[]>;
 }
 
 export async function getUserById(id: number) {
@@ -207,7 +207,7 @@ export async function addNewGasEngine(uid: number, prevState: GasEngineState, fo
      if (!res.success) {
           console.log(res.message);
           return {
-               errors: { general: "Adatbázis hiba!" },
+               errors: { general: ["Adatbázis hiba!"] },
                message: "Adatbázis hiba!"
           };
      }
@@ -243,7 +243,7 @@ export async function modifyGasEngine(id: number, prevState: GasEngineState, for
      if (!res.success) {
           console.log(res.message);
           return {
-               errors: { general: "Adatbázis hiba!" },
+               errors: { general: ["Adatbázis hiba!"] },
                message: "Adatbázis hiba!"
           };
      }
@@ -289,7 +289,7 @@ export async function addNewEnergyStorage(uid: number, prevState: EnergyStorageS
      if (!res.success) {
           console.log(res.message);
           return {
-               errors: { general: "Adatbázis hiba!" },
+               errors: { general: ["Adatbázis hiba!"] },
                message: "Adatbázis hiba!"
           };
      }
@@ -328,7 +328,7 @@ export async function modifyEnergyStorage(id: number, prevState: EnergyStorageSt
      if (!res.success) {
           console.log(res.message);
           return {
-               errors: { general: "Adatbázis hiba!" },
+               errors: { general: ["Adatbázis hiba!"] },
                message: "Adatbázis hiba!"
           };
      }
@@ -378,7 +378,7 @@ export async function addNewSolarPanel(uid: number, prevState: SolarPanelState, 
      if (!res.success) {
           console.log(res.message);
           return {
-               errors: { general: "Adatbázis hiba!" },
+               errors: { general: ["Adatbázis hiba!"] },
                message: "Adatbázis hiba!"
           };
      }
@@ -421,7 +421,7 @@ export async function modifySolarPanel(id: number, prevState: SolarPanelState, f
      if (!res.success) {
           console.log(res.message);
           return {
-               errors: { general: "Adatbázis hiba!" },
+               errors: { general: ["Adatbázis hiba!"] },
                message: "Adatbázis hiba!"
           };
      }
@@ -441,14 +441,14 @@ export async function getGenerators(type: "GAS" | "SOLAR" | "STORE", uid: number
      noStore();
      let table = DbNameExchange[type];
      const q = `SELECT * FROM ${table} WHERE uid = ${uid} ORDER BY active DESC;`;
-     return await exec_query(q) as DbActionResult<[SolarPanel | GasEngine | EnergyStorage]>;
+     return await exec_query(q) as DbActionResult<(SolarPanel | GasEngine | EnergyStorage)[] | null>;
 }
 
 export async function getGeneratorById(type: "GAS" | "SOLAR" | "STORE", id: number, uid: number) {
      noStore();
      let table = DbNameExchange[type];
      const q = `SELECT * FROM ${table} WHERE id = ${id} AND (uid = ${uid} OR ${uid} IN (SELECT id FROM user WHERE role = 'admin'));`;
-     const res = await exec_query(q) as DbActionResult<[SolarPanel | GasEngine | EnergyStorage]>;
+     const res = await exec_query(q) as DbActionResult<(SolarPanel | GasEngine | EnergyStorage)[]>;
      if (res.success && res.result!.length === 0)
           return { success: false, message: "Nincs ilyen generátor az adatbázisban!", result: null } as DbActionResult<null>;
      return res;

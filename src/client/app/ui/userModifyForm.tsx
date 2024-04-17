@@ -103,9 +103,10 @@ export default function Form({id, userData}: {id:number, userData:DbActionResult
                <div className='invalid-feedback'>
                     {state.message}
                </div>
-               <div className="d-flex justify-content-between">
-                    <Link className="btn btn-secondary" href="/usermanager">Vissza</Link>
-                    <button name="submitBtn" onClick={(e) => inputChange(e)} className="btn btn-warning" type="submit">Mentés</button>
+               <div className="row">
+                    <Link className="btn btn-secondary col-auto" href="/usermanager">Vissza</Link>
+                    <div className="col"><hr /></div>
+                    <button name="submitBtn" onClick={(e) => inputChange(e)} className="btn btn-warning col-auto" type="submit">Mentés</button>
                </div>
           </form>
      );

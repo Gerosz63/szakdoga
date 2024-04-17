@@ -1,11 +1,13 @@
 import { getUserById } from "@/app/lib/actions";
+import FormSkeleton from "@/app/ui/skeletons/userModifyFormSkeleton";
 import Form from "@/app/ui/userModifyForm";
 import { auth } from "@/auth";
+import { Suspense } from "react";
 
 
 export default async function Page() {
      const session = await auth();
-     const user =  await getUserById(+session?.user.id!);
+     const user = await getUserById(+session?.user.id!);
 
 
      return (
@@ -19,10 +21,19 @@ export default async function Page() {
                     <div className="col-9">
                          {
                               user.success ?
-                              <Form id={user.result!.id!} userData={user} />
-                              : <div role="alert" className="alert alert-danger">{user.message!}</div>
+                                   <Suspense fallback={<FormSkeleton />}>
+                                        <Form id={user.result!.id!} userData={user} />
+                                   </Suspense>
+                                   :
+                                   <>
+                                        <FormSkeleton />
+                                        <div className="bottom-0 position-fixed w-100 row px-2" tabIndex={-2}>
+                                             <div role='alert' className="alert alert-danger mt-4">
+                                                  {user.message!}
+                                             </div>
+                                        </div>
+                                   </>
                          }
-                         
                     </div>
                </div>
           </div>

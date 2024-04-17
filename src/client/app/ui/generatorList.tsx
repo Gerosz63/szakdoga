@@ -7,7 +7,7 @@ import { DbActionResult, EnergyStorage, GasEngine, SolarPanel } from "../lib/def
 import { useState } from "react";
 import { deleteEnergyStorage, deleteGasEngine, deleteSolarPanel } from "../lib/actions";
 
-export default function List({ title, type, elements }: { title: string, type: "GAS" | "SOLAR" | "STORE", elements: DbActionResult<[SolarPanel | GasEngine | EnergyStorage]> }) {
+export default function List({ title, type, elements }: { title: string, type: "GAS" | "SOLAR" | "STORE", elements: DbActionResult<(SolarPanel | GasEngine | EnergyStorage)[]> }) {
      const [state, setState] = useState({ id: -1, name: "" });
 
      function deleteGenerator() {

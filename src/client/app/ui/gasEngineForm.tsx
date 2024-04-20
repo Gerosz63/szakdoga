@@ -31,7 +31,7 @@ export default function Form({ action, gasEngine }: { action: "ADD" | "MODIFY", 
           SetGminusmax(true);
           SetCost(true);
           SetG0(true);
-
+          state.errors = {};
      }
 
      return (

@@ -25,12 +25,12 @@ export default function Element({ generator, type }: { generator: EnergyStorage 
      }
 
      return (
-          <div className={clsx("row align-items-center g-1 border rounded-4 py-2 px-1 cursor-pointer mb-3", { "opacity-50": !generator.active })}>
+          <div className={clsx("row align-items-center g-1 border rounded-4 py-2 px-1 cursor-pointer mb-3 mybg-white", { "opacity-50": !generator.active })}>
                <div className="col fs-4 ps-3">
                     {generator.name}
                </div>
-               <div className="col-lg-auto col-12">
-                    <button onClick={(e) => setState(!state)} className={clsx("btn", { "btn-info": !state }, { "btn-outline-info": state })} title="Részletek" data-bs-toggle="collapse" data-bs-target={"#" + elementId} aria-expanded="false" aria-controls={elementId}><FontAwesomeIcon icon={state ? faChevronDown : faChevronUp} /></button>
+               <div className="col-lg-auto col-12 text-end">
+                    <button onClick={(e) => setState(!state)} className={clsx("btn", { "btn-primary": !state }, { "btn-outline-primary": state })} title="Részletek" data-bs-toggle="collapse" data-bs-target={"#" + elementId} aria-expanded="false" aria-controls={elementId}><FontAwesomeIcon icon={state ? faChevronDown : faChevronUp} /></button>
                </div>
                <div id={elementId} className="collapse">
                     <hr />

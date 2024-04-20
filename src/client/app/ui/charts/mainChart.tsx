@@ -1,6 +1,7 @@
 "use client";
 import { ChartData } from '@/app/lib/definitions';
 import { LineChart, LineSeriesType } from "@mui/x-charts";
+import { cheerfulFiestaPalette } from '@mui/x-charts/colorPalettes';
 
 export default function MainChart({ data }: { data: ChartData }) {
 
@@ -13,6 +14,7 @@ export default function MainChart({ data }: { data: ChartData }) {
                ...series,
                { data: data.demand!, label: "Fogyasztás", curve: "stepBefore", highlightScope: {highlighted: 'series', faded:"global"}},
           ]}
+          colors={cheerfulFiestaPalette}
           xAxis={[
                {data: data.xLabels, scaleType: "point", label: "Idő intervallum"}
           ]}

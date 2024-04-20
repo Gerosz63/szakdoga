@@ -140,8 +140,8 @@ export const SolarPanelNameExchange: SolarPanel = {
      r0: "Kezdeti termelés",
      shift_start: "Eltolás mértéke",
      exp_v: "Maximum helye",
-     intval_range: "Környezet mérete",
-     value_at_end: "Környezet szélén lévő érték",
+     intval_range: "Sugár mérete",
+     value_at_end: "Görbe szélén lévő érték",
      addNoise: "Zaj:",
      seed: "Seed értéke",
 };
@@ -259,4 +259,4 @@ export const apiAuthRoute = "/api/auth";
 
 export const adminRoute = "/usermanager";
 
-export const defaultLoginRedirect = "/home";
+export const defaultLoginRedirect = "/simulate";

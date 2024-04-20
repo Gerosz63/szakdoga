@@ -5,7 +5,7 @@ export const FormModifySchema = z.object({
      id: z.number(),
      username: z.string(),
      password: z.string().nullable(),
-     role: z.enum(["admin", "user"]),
+     role: z.enum(["admin", "user"]).nullable(),
 }).superRefine(async (val, ctx) => {
      const userId = await isUserExists(val.id);
      if (userId.success && !userId.result) {

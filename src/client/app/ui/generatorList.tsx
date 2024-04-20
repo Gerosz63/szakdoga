@@ -53,11 +53,11 @@ export default function List({ title, type, elements }: { title: string, type: "
 
      return (
           <>
-               <div className="border rounded-4 shadow px-2 py-3 mb-2">
-                    <div className="d-flex justify-content-between">
+               <div className="rounded-4 border px-2 py-3 mb-2 bg-light">
+                    <div className="d-flex justify-content-between ps-3">
                          <h3>{title}</h3>
                          <div>
-                              <Link href={`/simulate/add/${page()}`} className="btn btn-outline-success">
+                              <Link href={`/simulate/add/${page()}`} className="btn btn-success">
                                    <FontAwesomeIcon icon={faPlus} />
                               </Link>
                          </div>
@@ -77,7 +77,7 @@ export default function List({ title, type, elements }: { title: string, type: "
                     <div className="modal-dialog">
                          <div className="modal-content">
                               <div className="modal-header">
-                                   <h1 className="modal-title fs-5" id={`modal${type}DeleteLabel`}>Biztosan törlöd a(z) {state.name} nevű {typeText()}</h1>
+                                   <h1 className="modal-title fs-5" id={`modal${type}DeleteLabel`}>Biztosan törlöd a(z) <b>{state.name}</b> nevű {typeText()}</h1>
                                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                               </div>
                               <div className="modal-footer">

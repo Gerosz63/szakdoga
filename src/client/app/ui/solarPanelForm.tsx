@@ -43,6 +43,7 @@ export default function Form({ action, solarPanel }: { action: "ADD" | "MODIFY",
           SetValue_at_end(true);
           SetAddNoise(true);
           SetSeed(true);
+          state.errors = {};
      }
 
 
@@ -80,7 +81,7 @@ export default function Form({ action, solarPanel }: { action: "ADD" | "MODIFY",
                <div className="row px-md-5 px-2">
                     <div className="col">
                          <h3 className="text-center">A napelemek működése</h3>
-                         <p>A napelemek energiatermelését úgy szimuláljuk, hogy egy harangörbét veszünk alapul. Ennél a görbénél a</p>
+                         <p>A napelemek energiatermelését úgy szimuláljuk, hogy egy harangörbét veszünk alapul. Ennél a görbénél a csúcspontjának a <b>Maximum helyét</b> illetve azt az sugarat melyen belül a görbe pozitív értéket vegyen fel.</p>
                     </div>
                </div>
                <hr />
@@ -102,8 +103,8 @@ export default function Form({ action, solarPanel }: { action: "ADD" | "MODIFY",
                     <div className="col-md-2">
                          <label className="form-label" htmlFor="addNoise">Zaj beállítása:</label>
                          <select onChange={(e) => SetAddNoise(false)} className={clsx("form-control", { "is-invalid": state.errors?.addNoise && addNoiseState, "is-valid": addNoiseState && Object.keys(state.errors ?? {}).length !== 0 && !state.errors?.addNoise })} name="addNoise" id="addNoise" defaultValue={solarPanel?.value_at_end ?? "0"}>
-                              <option value="1">Hozzáadás</option>
-                              <option value="0">Elvétel</option>
+                              <option value="1">Zajosítás</option>
+                              <option value="0">Nem használom</option>
                          </select>
                          {
                               (state.errors?.addNoise && addNoiseState) &&

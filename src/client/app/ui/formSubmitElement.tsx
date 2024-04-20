@@ -10,7 +10,7 @@ export default function Submit({ action, inputChange, href }: { action: "MODIFY"
                </div>
                <div className="col"><hr /></div>
                <div className="col-auto">
-                    <button name="submitBtn" onClick={(e) => inputChange()} className={clsx("btn", { "btn-warning": action == "MODIFY" }, { "btn-success": action == "ADD" })} type="submit">{action == "ADD" ? "Hozzáadás" : "Módosítás"}</button>
+                    <button name="submitBtn" onClick={(e) => inputChange()} className="btn btn-success" type="submit">{action == "ADD" ? "Hozzáadás" : "Módosítás"}</button>
                </div>
           </div>
      );

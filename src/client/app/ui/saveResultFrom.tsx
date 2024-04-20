@@ -34,7 +34,7 @@ export default function Form({ id, name, saved }: { id: number, name: string, sa
                     }
                </div>
                <div className="col-auto">
-                    <button onClick={(e) => SetSaved(true)} className="btn btn-success" type="submit">Mentés <FontAwesomeIcon icon={faFloppyDisk} /></button>
+                    <button onClick={(e) => {SetSaved(true); state.error = null;}} className="btn btn-success" type="submit">Mentés <FontAwesomeIcon icon={faFloppyDisk} /></button>
                </div>
           </form>
      );

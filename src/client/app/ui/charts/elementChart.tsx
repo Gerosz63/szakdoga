@@ -2,6 +2,7 @@
 
 import { ChartData } from "@/app/lib/definitions";
 import { LineChart } from "@mui/x-charts";
+import { cheerfulFiestaPalette } from '@mui/x-charts/colorPalettes';
 
 export default function ElementChart({ data }: { data: ChartData }) {
 
@@ -12,6 +13,7 @@ export default function ElementChart({ data }: { data: ChartData }) {
                          data: e.data, label: e.name, curve: "stepBefore", highlightScope: { highlighted: 'series', faded: "global" }
                     }
                })}
+               colors={cheerfulFiestaPalette}
                xAxis={[
                     { data: data.xLabels, scaleType: "point", label: "Idő intervallum" }
                ]}

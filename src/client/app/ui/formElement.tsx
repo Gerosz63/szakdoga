@@ -32,7 +32,7 @@ export default function Element(
      }
      return (
           <>
-               <label className="form-label" htmlFor={name}>{title}:</label>
+               <label className={clsx("form-label", { "required  fw-bold": required })} htmlFor={name}>{title}:</label>
                <input onChange={(e) => setFunc(false)} className={clsx("form-control", { "is-invalid": state.errors[name] && elemState, "is-valid": elemState && Object.keys(state.errors ?? {}).length !== 0 && !state.errors[name] })} type="text" name={name} id={name} required={required} maxLength={maxLen} defaultValue={defaultValue ?? ""} />
                {
                     (state.errors[name] && elemState) &&

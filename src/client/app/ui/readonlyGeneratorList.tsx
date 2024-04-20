@@ -5,7 +5,7 @@ export default function List({ title, type, elements }: { title: string, type: "
 
 
      return (
-          <div className="border rounded-4 shadow px-2 py-3 mb-2">
+          <div className="border rounded-4 shadow px-2 py-3 mb-2 ps-3 bg-light">
                <h3>{title}</h3>
                <hr />
                <div className="container-fluid">

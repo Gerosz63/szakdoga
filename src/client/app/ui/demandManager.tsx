@@ -52,8 +52,8 @@ export default function DemandManager({ uid, localDemand }: { uid: number, local
           if (demandState.state)
                return;
           const res = await simulate(uid, demandState.value);
-          
-          SetSimState({success: false, message: res.error});
+          if (res.error)
+               SetSimState({success: false, message: res.error});
      }
 
      return (
@@ -85,11 +85,11 @@ export default function DemandManager({ uid, localDemand }: { uid: number, local
                               }
                          </div>
                          <div className="col-auto">
-                              <button data-bs-toggle="collapse" data-bs-target="#collapseDemand" aria-expanded="false" aria-controls="collapseDemand" onClick={e => SetBtnState(!btnState)} className={clsx("btn", { "btn-secondary": btnState, "btn-outline-secondary": !btnState })} type="button"><FontAwesomeIcon icon={!btnState ? faEye : faEyeSlash} /></button>
+                              <button data-bs-toggle="collapse" data-bs-target="#collapseDemand" aria-expanded="false" aria-controls="collapseDemand" onClick={e => SetBtnState(!btnState)} className="btn btn-secondary" type="button"><FontAwesomeIcon icon={!btnState ? faEye : faEyeSlash} /></button>
                          </div>
                     </div>
                     <div className="row justify-content-center collapse" id="collapseDemand">
-                         <div className="col-9" style={{ height: "300px" }}>
+                         <div className="col-9 bg-light shadow mt-2 rounded-4" style={{ height: "300px" }}>
                               <LineChart
                                    series={[
                                              {data: demandState.value, label: "Fogyasztás", curve: "step"}

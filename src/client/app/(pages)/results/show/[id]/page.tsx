@@ -64,7 +64,7 @@ export default async function Page({ params }: { params: { id: string } }) {
                          <h1>{isnew ? "Új eredmény" : `${name} eredmény`}</h1>
                     </div>
                     <div className="col text-end">
-                         <h3 className="mb-0">{`${exec_time}ms`}</h3>
+                         <h3 className="mb-0">{`${exec_time == "-" ? "-" : Math.ceil(exec_time * 1000) / 1000} ms`}</h3>
                          <p className="text-body-secondary mt-0 pt-0">Szimuláció hossza</p>
                     </div>
                </div>
@@ -85,10 +85,10 @@ export default async function Page({ params }: { params: { id: string } }) {
                                    <div className="col-11">
                                         <div className="row align-items-center gx-0 my-3">
                                              <div className="col"><hr /></div>
-                                             <div className="col-auto border-start border-end px-2 rounded-3 shadow py-2"><h3 className="p-0 m-0">Összesített eredmények</h3></div>
+                                             <div className="bg-light col-auto border-start border-end px-2 rounded-3 shadow py-2"><h3 className="p-0 m-0">Összesített eredmények</h3></div>
                                              <div className="col"><hr /></div>
                                         </div>
-                                        <div style={{ height: "400px" }}>
+                                        <div style={{ height: "400px" }} className="mybg-white rounded-4">
                                              <Suspense fallback={<ChartSkeleton />}>
                                                   <MainChart data={{ xLabels: data.result!.labels, chartdata: mainChart_data.map((e) => { return { name: e.name, data: dublicateFirstItem(e.data) }; }), demand: dublicateFirstItem(data.result!.demand) }} />
                                              </Suspense>
@@ -99,10 +99,10 @@ export default async function Page({ params }: { params: { id: string } }) {
                                         <div className="col-11 my-3">
                                              <div className="row align-items-center gx-0 mb-3">
                                                   <div className="col"><hr /></div>
-                                                  <div className="col-auto border-start border-end px-2 rounded-3 shadow py-2"><h3 className="p-0 m-0">Gázmotorok eredményei</h3></div>
+                                                  <div className="bg-light col-auto border-start border-end px-2 rounded-3 shadow py-2"><h3 className="p-0 m-0">Gázmotorok eredményei</h3></div>
                                                   <div className="col"><hr /></div>
                                              </div>
-                                             <div style={{ height: "400px" }}>
+                                             <div style={{ height: "400px" }} className="mybg-white rounded-4">
                                                   <Suspense fallback={<ChartSkeleton />}>
                                                        <ElementChart data={{ xLabels: data.result!.labels, chartdata: data.result!.elements.GAS.map((e) => { return { name: e.name, data: dublicateFirstItem(e.data) }; }) }} />
                                                   </Suspense>
@@ -114,10 +114,10 @@ export default async function Page({ params }: { params: { id: string } }) {
                                         <div className="col-11 my-3">
                                              <div className="row align-items-center gx-0 mb-3">
                                                   <div className="col"><hr /></div>
-                                                  <div className="col-auto border-start border-end px-2 rounded-3 shadow py-2"><h3 className="p-0 m-0">Energia tárolók eredményei</h3></div>
+                                                  <div className="bg-light col-auto border-start border-end px-2 rounded-3 shadow py-2"><h3 className="p-0 m-0">Energia tárolók eredményei</h3></div>
                                                   <div className="col"><hr /></div>
                                              </div>
-                                             <div style={{ height: "400px" }}>
+                                             <div style={{ height: "400px" }} className="mybg-white rounded-4">
                                                   <Suspense fallback={<ChartSkeleton />}>
                                                        <StorageChart data={{
                                                             xLabels: data.result!.labels, chartdata: [
@@ -131,13 +131,13 @@ export default async function Page({ params }: { params: { id: string } }) {
                                    }
                                    {
                                         data.result!.elementTypes.SOLAR &&
-                                        <div className="col-11 my-3" style={{ height: "400px" }}>
+                                        <div className="col-11 mt-3 mb-5" style={{ height: "400px" }}>
                                              <div className="row align-items-center gx-0 mb-3">
                                                   <div className="col"><hr /></div>
-                                                  <div className="col-auto border-start border-end px-2 rounded-3 shadow py-2"><h3 className="p-0 m-0">Napelemek eredményei</h3></div>
+                                                  <div className="bg-light col-auto border-start border-end px-2 rounded-3 shadow py-2"><h3 className="p-0 m-0">Napelemek eredményei</h3></div>
                                                   <div className="col"><hr /></div>
                                              </div>
-                                             <div style={{ height: "400px" }}>
+                                             <div style={{ height: "400px" }} className="mybg-white rounded-4">
                                                   <Suspense fallback={<ChartSkeleton />}>
                                                        <ElementChart data={{ xLabels: data.result!.labels, chartdata: data.result!.elements.SOLAR.map((e) => { return { name: e.name, data: dublicateFirstItem(e.data) }; }) }} />
                                                   </Suspense>
@@ -152,7 +152,7 @@ export default async function Page({ params }: { params: { id: string } }) {
                     <>
                          <div className="row align-items-center gx-0 mt-5">
                               <div className="col"><hr /></div>
-                              <div className="col-auto border-start border-end px-2 rounded-3 shadow py-2"><h3 className="p-0 m-0">Generátorok</h3></div>
+                              <div className="bg-light col-auto border-start border-end px-2 rounded-3 shadow py-2"><h3 className="p-0 m-0">Generátorok</h3></div>
                               <div className="col"><hr /></div>
                          </div>
                          <div className="row gx-2 my-5">

@@ -14,10 +14,10 @@ export default function List({ results }: { results: { id: number, name: string,
           <div className="mt-3">
                {
                     results.map((e) =>
-                         <div key={e.id} className="fs-5 row justify-content-center border mt-2 rounded py-2 align-items-center shadow">
+                         <div key={e.id} className="fs-5 row justify-content-center border mt-3 rounded py-2 align-items-center shadow mybg-white">
                               <div className="col-lg-4 fw-bold">{e.name}</div>
                               <div className="col-lg-4">{e.saveDate.toISOString().replace("T", " ").replace(".000Z", "")}</div>
-                              <div className="col-lg-2">{e.exec_time}ms</div>
+                              <div className="col-lg-2 text-end">{Math.ceil(e.exec_time  * 1000) / 1000} ms</div>
                               <div className="col-lg-2">
                                    <div className="input-group justify-content-end">
                                         <Link className="btn btn-secondary" href={`/results/show/${e.id}`}><FontAwesomeIcon icon={faEye} /></Link>
@@ -31,7 +31,7 @@ export default function List({ results }: { results: { id: number, name: string,
                     <div className="modal-dialog">
                          <div className="modal-content">
                               <div className="modal-header">
-                                   <h1 className="modal-title fs-5" id="resultDeleteModalLabel">Biztosan törlöd a(z) {state.name} nevű eredményed?</h1>
+                                   <h1 className="modal-title fs-5" id="resultDeleteModalLabel">Biztosan törlöd a(z) <b>{state.name}</b> nevű eredményed?</h1>
                                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                               </div>
                               <div className="modal-footer">

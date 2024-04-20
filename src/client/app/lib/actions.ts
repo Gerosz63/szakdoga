@@ -70,13 +70,13 @@ export async function modifyUser(id: number, prevState: UserState, formData: For
           };
      }
      const data = dataValidated.data;
-     const q = `UPDATE user SET username = ${escape(data.username)}${data.password !== null ? ", password = '" + hash(data.password, 10) + "'" : ""}, role = ${escape(data.role)} WHERE id = ${id};`;
+     const q = `UPDATE user SET username = ${escape(data.username)}${data.password !== null ? ", password = '" + hash(data.password, 10) + "'" : ""}${data.role !== null ? ", role =" + escape(data.role) : ""} WHERE id = ${id};`;
      const res = await exec_query(q);
      if (!res.success) {
           console.log(res?.message);
           return { message: "Adatbázis hiba! A felhasználó módosítása sikertelen!" };
      }
-     revalidatePath('/usermanager');
+     revalidatePath('/');
      redirect('/usermanager');
 }
 

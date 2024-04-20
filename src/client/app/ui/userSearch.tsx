@@ -25,7 +25,7 @@ export default function Search() {
      return (
           <div className="input-group">
                <input defaultValue={searchParams.get('query')?.toString()} onChange={(e) => handleSearch(e.target.value)} type="text" className="form-control" placeholder="Keress felhasználó névre..." />
-               <Link href="/usermanager/create" className="btn btn-outline-success"><FontAwesomeIcon icon={faPlus} /></Link>
+               <Link href="/usermanager/create" className="btn btn-success"><FontAwesomeIcon icon={faPlus} /></Link>
           </div>
      );
 }

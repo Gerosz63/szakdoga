@@ -7,9 +7,8 @@ import { faMoon } from "@fortawesome/free-regular-svg-icons";
 import { useState } from "react";
 import { removeUser } from "@/app/lib/actions";
 
-export default function Table({ users }: { users: DbActionResult<User[]> | DbActionResult<null> }) {
+export default function Table({ users, uid }: { users: DbActionResult<User[]> | DbActionResult<null>, uid:number }) {
      const [state, setState] = useState({ username: "", id: -1 });
-
      return (
           <>
                <div className="container-fluid mb-4">
@@ -28,7 +27,7 @@ export default function Table({ users }: { users: DbActionResult<User[]> | DbAct
                          users?.success &&
                          users!.result?.map(e => {
                               return (
-                                   <div key={e.id} className="row border rounded-4 shadow my-2 px-2 py-2 align-items-center">
+                                   <div key={e.id} className="row border rounded-4 shadow my-3 px-2 py-2 align-items-center bg-light">
                                         <div className="col-5">
                                              {e.username}
                                         </div>
@@ -41,7 +40,10 @@ export default function Table({ users }: { users: DbActionResult<User[]> | DbAct
                                         <div className="col-3">
                                              <div className="input-group justify-content-end">
                                                   <Link href={`/usermanager/${e.id}/modify`} className="btn btn-warning" type="button"><FontAwesomeIcon icon={faPen} /></Link>
-                                                  <button data-bs-toggle="modal" data-bs-target="#deleteModal" onClick={(a) => setState({ username: e.username, id: e.id! })} className="btn btn-danger" type="button"><FontAwesomeIcon icon={faTrash} /></button>
+                                                  {
+                                                       e.id != uid &&
+                                                       <button data-bs-toggle="modal" data-bs-target="#deleteModal" onClick={(a) => setState({ username: e.username, id: e.id! })} className="btn btn-danger" type="button"><FontAwesomeIcon icon={faTrash} /></button>
+                                                  }
                                              </div>
                                         </div>
                                    </div>
@@ -67,7 +69,7 @@ export default function Table({ users }: { users: DbActionResult<User[]> | DbAct
                     <div className="modal-dialog">
                          <div className="modal-content">
                               <div className="modal-header">
-                                   <h5 className="modal-title">Biztosan törlöd a(z) {state.username} nevű felhasználót?</h5>
+                                   <h5 className="modal-title">Biztosan törlöd a(z) <b>{state.username}</b> nevű felhasználót?</h5>
                                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                               </div>
                               <div className="modal-footer">

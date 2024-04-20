@@ -22,7 +22,7 @@ export default async function Page() {
                          {
                               user.success ?
                                    <Suspense fallback={<FormSkeleton />}>
-                                        <Form id={user.result!.id!} userData={user} />
+                                        <Form id={+session!.user.id!} userData={user} />
                                    </Suspense>
                                    :
                                    <>

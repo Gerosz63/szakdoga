@@ -38,6 +38,7 @@ export default function Form() {
                     setPasswordState(true);
                     setPasswordRepState(true);
                     setRoleState(true);
+                    state.errors = {};
                     break;
                default: 
                     break;

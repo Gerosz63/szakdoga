@@ -36,6 +36,7 @@ export default function From({ action, energyStorage }: { action: "ADD" | "MODIF
           SetCharge_cost(true);
           SetDischarge_cost(true);
           SetS0(true);
+          state.errors = {};
      }
 
      return (

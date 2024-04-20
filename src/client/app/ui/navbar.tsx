@@ -34,10 +34,10 @@ export default function Navbar() {
                }
           );
      return (
-          <nav className="navbar navbar-expand-lg bg-body-tertiary">
+          <nav className="navbar navbar-expand-lg mybg-green">
                <div className="container-fluid">
-                    <Link className="navbar-brand" href='/home'>
-                         Home
+                    <Link className="navbar-brand fs-3 text-dark p-2 rounded-4" href="">
+                         OTIMIZER
                     </Link>
                     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                          <span className="navbar-toggler-icon"></span>
@@ -46,15 +46,15 @@ export default function Navbar() {
                          <ul className="navbar-nav me-auto mb-2 mb-md-0">
                               {links.map((e) => {
                                    return (
-                                        <li key={e.name} className="nav-item ">
-                                             <Link className={clsx("nav-link", { "active": linkPath.startsWith(e.path) })} href={e.path}>{e.text}</Link>
+                                        <li key={e.name} className="nav-item my-1">
+                                             <Link className={clsx("nav-link fs-5 px-2", { "active rounded shadow": linkPath.startsWith(e.path) })} href={e.path}>{e.text}</Link>
                                         </li>
                                    );
                               })}
                          </ul>
                          <div className="d-flex">
                               <div className="dropdown">
-                                   <button className="btn btn-outline-secondary alig-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                   <button className="btn btn-secondary alig-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         <span className="border-end pe-2">{user?.name}</span> <FontAwesomeIcon className="ms-1" icon={faUser} />
                                    </button>
                                    <ul className="dropdown-menu dropdown-menu-lg-end dropdown-menu-start">

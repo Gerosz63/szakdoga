@@ -1,3 +1,6 @@
+/**
+ * Type of the user in the database.
+ */
 export type User = {
      id?: number,
      username: string,
@@ -6,6 +9,9 @@ export type User = {
      theme?: "dark" | "light"
 };
 
+/**
+ * A type for fields which can be found in all types of generators
+ */
 type GeneratorBase = {
      id: number,
      uid: number,
@@ -13,6 +19,9 @@ type GeneratorBase = {
      active: boolean,
 };
 
+/**
+ * The type of gas engines
+ */
 export type GasEngine = GeneratorBase & {
      gmax: number | string,
      gplusmax: number | string,
@@ -21,6 +30,9 @@ export type GasEngine = GeneratorBase & {
      g0: number | string,
 };
 
+/**
+ * The type of solar panels
+ */
 export type SolarPanel = GeneratorBase & {
      r_max: number | string,
      delta_r_plus_max: number | string,
@@ -35,6 +47,9 @@ export type SolarPanel = GeneratorBase & {
      seed: number | string,
 };
 
+/**
+ * The type of energy storages
+ */
 export type EnergyStorage = GeneratorBase & {
      storage_min: number | string,
      storage_max: number | string,
@@ -47,6 +62,9 @@ export type EnergyStorage = GeneratorBase & {
      s0: number | string,
 };
 
+/**
+ * The type of the results
+ */
 export type Results = {
      id: number,
      uid: number,
@@ -57,6 +75,9 @@ export type Results = {
      exec_time: number
 }
 
+/**
+ * The type which the backend will produce data for chart visualization (all type included)
+ */
 export type Charts = {
      id: number,
      name: string,
@@ -97,6 +118,9 @@ export type Charts = {
      }
 };
 
+/**
+ * Type for single chart data for visualization
+ */
 export type ChartData = {
      xLabels: number[],
      chartdata: {
@@ -108,14 +132,18 @@ export type ChartData = {
      }[]
 };
 
-
-
+/**
+ * Type for backend action result.
+ */
 export type DbActionResult<T> = {
      success: boolean,
      result: T | null,
      message?: string
 };
 
+/**
+ * Name exchange for gas engine fields and visualized texts
+ */
 export const GasEngineNameExchange: GasEngine = {
      id: 0,
      uid: 0,
@@ -128,6 +156,9 @@ export const GasEngineNameExchange: GasEngine = {
      g0: "Kezdeti termelés",
 };
 
+/**
+ * Name exchange for solar panel fields and visualized texts
+ */
 export const SolarPanelNameExchange: SolarPanel = {
      id: 0,
      uid: 0,
@@ -146,6 +177,9 @@ export const SolarPanelNameExchange: SolarPanel = {
      seed: "Seed értéke",
 };
 
+/**
+ * Name exchange for energy storage fields and visualized texts
+ */
 export const EnergyStorageNameExchange: EnergyStorage = {
      id: 0,
      uid: 0,
@@ -162,12 +196,18 @@ export const EnergyStorageNameExchange: EnergyStorage = {
      s0: "Kezdeti töltöttségi szint",
 };
 
+/**
+ * Type for exchange DB tables sort name fro actual name
+ */
 export type DBShortName = {
      GAS: string,
      SOLAR: string,
      STORE: string
 };
 
+/**
+ * Type of data which goes between the solver API and the backend
+ */
 export type SolverData = {
      demand: number[],
      generators: {
@@ -178,12 +218,18 @@ export type SolverData = {
      result: number[]
 };
 
+/**
+ * DB table name exchange
+ */
 export const DbNameExchange: DBShortName = {
      GAS: "gas_engines",
      SOLAR: "solar_panel",
      STORE: "energy_storage",
 }
 
+/**
+ * Form state type for suer manager
+ */
 export type UserState = {
      errors?: {
           username?: string[];
@@ -196,6 +242,9 @@ export type UserState = {
      message?: string | null;
 };
 
+/**
+ * Form state type for gas engines
+ */
 export type GasEngineState = {
      errors?: {
           name?: string[];
@@ -209,6 +258,9 @@ export type GasEngineState = {
      message?: string | null;
 };
 
+/**
+ * Form state type for energy storages
+ */
 export type EnergyStorageState = {
      errors?: {
           name?: string[];
@@ -226,6 +278,9 @@ export type EnergyStorageState = {
      message?: string | null;
 };
 
+/**
+ * Form state type for solar panels
+ */
 export type SolarPanelState = {
      errors?: {
           name?: string[];
@@ -246,17 +301,31 @@ export type SolarPanelState = {
 };
 
 
-
+/**
+ * list of public routes
+ */
 export const publicRoutes = [
      "/",
 ];
 
+/**
+ * List of login routes
+ */
 export const authRoutes = [
      "/login",
 ];
 
+/**
+ * The auth API route
+ */
 export const apiAuthRoute = "/api/auth";
 
+/**
+ * The route which can be accessed only with admin role
+ */
 export const adminRoute = "/usermanager";
 
+/**
+ * The page route where the user should be redirected after login.
+ */
 export const defaultLoginRedirect = "/simulate";

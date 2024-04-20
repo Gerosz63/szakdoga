@@ -49,14 +49,14 @@ export async function addUser(prevState: UserState, formData: FormData) {
 
 /**
  * Action to modify existing user in database then revalidating usermanager path and redirect to it.
- * @param id User id
+ * @param id
  * @param prevState 
  * @param formData 
  * @returns 
  */
-export async function modifyUser(id: number, prevState: UserState, formData: FormData) {
+export async function modifyUser(uid: number, prevState: UserState, formData: FormData) {
      const dataValidated = await FormModifySchema.safeParseAsync({
-          id: id,
+          id: uid,
           username: formData.get("username"),
           password: formData.get("passworld"),
           role: formData.get("role")
@@ -70,7 +70,7 @@ export async function modifyUser(id: number, prevState: UserState, formData: For
           };
      }
      const data = dataValidated.data;
-     const q = `UPDATE user SET username = ${escape(data.username)}${data.password !== null ? ", password = '" + hash(data.password, 10) + "'" : ""}${data.role !== null ? ", role =" + escape(data.role) : ""} WHERE id = ${id};`;
+     const q = `UPDATE user SET username = ${escape(data.username)}${data.password !== null ? ", password = '" + hash(data.password, 10) + "'" : ""}${data.role !== null ? ", role =" + escape(data.role) : ""} WHERE id = ${uid};`;
      const res = await exec_query(q);
      if (!res.success) {
           console.log(res?.message);
@@ -97,6 +97,11 @@ export async function removeUser(id: number) {
 }
 
 
+/**
+ * Determine if a user is exsist by its name or id.
+ * @param userId 
+ * @returns 
+ */
 export async function isUserExists(userId: string | number) {
      const q = `SELECT id FROM user WHERE ${typeof userId == "number" ? "id = " + userId : "username = " + escape(userId)}`;
      const res = await exec_query(q);
@@ -107,7 +112,13 @@ export async function isUserExists(userId: string | number) {
      return { result: res.result?.length != 0, success: true } as DbActionResult<boolean>;
 }
 
-
+/**
+ * Returns list of users by the search value and the selected page number.
+ * @param search 
+ * @param page 
+ * @param limit 
+ * @returns 
+ */
 export async function listUsers(search: string = "", page: number = 1, limit: number = 10) {
      noStore();
      const q = `SELECT id, username, role, theme FROM user${search && " WHERE username LIKE '%" + escape(search).substring(1, escape(search).length - 1) + "%'"} LIMIT ${(page - 1) * 10},${limit};`;
@@ -120,6 +131,11 @@ export async function listUsers(search: string = "", page: number = 1, limit: nu
      return { success: true, result: res.result as Array<User> } as DbActionResult<User[]>;
 }
 
+/**
+ * Returns a user by its id.
+ * @param id 
+ * @returns 
+ */
 export async function getUserById(id: number) {
      noStore();
      const q = await `SELECT username, role FROM user WHERE id = ${id};`;
@@ -136,6 +152,11 @@ export async function getUserById(id: number) {
      return { success: true, result: res.result[0] as User } as DbActionResult<User>;
 }
 
+/**
+ * Returns a user by its name.
+ * @param name 
+ * @returns 
+ */
 export async function getUserByName(name: string) {
      noStore();
      const q = `SELECT id, username, password, role FROM user WHERE username = ${escape(name)};`;
@@ -152,6 +173,12 @@ export async function getUserByName(name: string) {
      return { success: true, result: res.result[0] as User } as DbActionResult<User>;
 }
 
+/**
+ * Login to the page and delets the additional cookies.
+ * @param prevState 
+ * @param formData 
+ * @returns 
+ */
 export async function login(prevState: string | undefined, formData: FormData) {
      try {
           await signIn("credentials", formData);
@@ -169,17 +196,32 @@ export async function login(prevState: string | undefined, formData: FormData) {
           throw error;
      }
 }
+
+/**
+ * Logs out from page and deletes the cookies.
+ */
 export async function logout() {
      const mycookie = cookies();
      mycookie.delete("demand");
      await signOut();
 }
 
-export async function SetDemandInCookie(data:string) {
+/**
+ * Save demand value into cookie.
+ * @param data 
+ */
+export async function SetDemandInCookie(data: string) {
      const mycookie = cookies();
      mycookie.set("demand", data);
 }
 
+/**
+ * Adds new gas engine. Validates data and if correct adds new engine to database then revalidates page and redirects to page simulate.
+ * @param uid 
+ * @param prevState 
+ * @param formData 
+ * @returns 
+ */
 export async function addNewGasEngine(uid: number, prevState: GasEngineState, formData: FormData) {
      const g0 = formData.get("g0") === "" ? null : formData.get("g0");
      const validatedData = GasEngineSchema.safeParse({
@@ -216,6 +258,13 @@ export async function addNewGasEngine(uid: number, prevState: GasEngineState, fo
      redirect("/simulate");
 }
 
+/**
+ * Modify gas engine by id. Validates data and if it's correct modify the engine in database, then revalidates page and redirects to page simulate.
+ * @param id 
+ * @param prevState 
+ * @param formData 
+ * @returns 
+ */
 export async function modifyGasEngine(id: number, prevState: GasEngineState, formData: FormData) {
      const g0 = formData.get("g0") === "" ? null : formData.get("g0");
      const validatedData = GasEngineSchema.safeParse({
@@ -253,12 +302,26 @@ export async function modifyGasEngine(id: number, prevState: GasEngineState, for
 
 }
 
+/**
+ * Deletes gase engine by id.
+ * @param id 
+ */
 export async function deleteGasEngine(id: number) {
      const q = `DELETE FROM gas_engines WHERE id = ${id};`;
      const res = await exec_query(q);
-     revalidatePath("/simulate");
+     if (res.success)
+          revalidatePath("/simulate");
+     else
+          return res;
 }
 
+/**
+ * Adds new energy storage. Validates data and if correct adds new storage to database then revalidates page and redirects to page simulate.
+ * @param uid 
+ * @param prevState 
+ * @param formData 
+ * @returns 
+ */
 export async function addNewEnergyStorage(uid: number, prevState: EnergyStorageState, formData: FormData) {
      const validatedData = EnergyStorageSchema.safeParse({
           name: formData.get("genName"),
@@ -298,6 +361,13 @@ export async function addNewEnergyStorage(uid: number, prevState: EnergyStorageS
      redirect("/simulate");
 }
 
+/**
+ * Modify energy storage by id. Validates data and if it's correct then modify engine in database, then revalidates page and redirects to page simulate.
+ * @param id 
+ * @param prevState 
+ * @param formData 
+ * @returns 
+ */
 export async function modifyEnergyStorage(id: number, prevState: EnergyStorageState, formData: FormData) {
      const validatedData = EnergyStorageSchema.safeParse({
           name: formData.get("genName"),
@@ -338,12 +408,27 @@ export async function modifyEnergyStorage(id: number, prevState: EnergyStorageSt
 
 }
 
+/**
+ * Deletes energy storage by id.
+ * @param id 
+ */
 export async function deleteEnergyStorage(id: number) {
      const q = `DELETE FROM energy_storage WHERE id = ${id};`;
      const res = await exec_query(q);
-     revalidatePath("/simulate");
+     if (res.success)
+          revalidatePath("/simulate");
+     else
+          return res;
 }
 
+
+/**
+ * Adds new solar panel. First validates form data then if it's correct inserts to db and revalidate page then redirect to page simulate.
+ * @param uid 
+ * @param prevState 
+ * @param formData 
+ * @returns 
+ */
 export async function addNewSolarPanel(uid: number, prevState: SolarPanelState, formData: FormData) {
      const r0 = formData.get("r0") === "" ? null : formData.get("r0");
      const seed = formData.get("seed") === "" ? null : formData.get("seed");
@@ -386,7 +471,13 @@ export async function addNewSolarPanel(uid: number, prevState: SolarPanelState, 
      revalidatePath("/simulate");
      redirect("/simulate");
 }
-
+/**
+ * Modify solar panel by id. First validates form data then if it's correct updates solar panel in db and revalidate page then redirect to page simulate.
+ * @param id 
+ * @param prevState 
+ * @param formData 
+ * @returns 
+ */
 export async function modifySolarPanel(id: number, prevState: SolarPanelState, formData: FormData) {
      const r0 = formData.get("r0") === "" ? null : formData.get("r0");
      const seed = formData.get("seed") === "" ? null : formData.get("seed");
@@ -431,12 +522,25 @@ export async function modifySolarPanel(id: number, prevState: SolarPanelState, f
 
 }
 
+/**
+ * Deletes solar panel by id.
+ * @param id 
+ */
 export async function deleteSolarPanel(id: number) {
      const q = `DELETE FROM solar_panel WHERE id = ${id};`;
      const res = await exec_query(q);
-     revalidatePath("/simulate");
+     if (res.success)
+          revalidatePath("/simulate");
+     else
+          return res;
 }
 
+/**
+ * Gets all generator by uid and their type. 
+ * @param type 
+ * @param uid 
+ * @returns 
+ */
 export async function getGenerators(type: "GAS" | "SOLAR" | "STORE", uid: number) {
      noStore();
      let table = DbNameExchange[type];
@@ -444,6 +548,13 @@ export async function getGenerators(type: "GAS" | "SOLAR" | "STORE", uid: number
      return await exec_query(q) as DbActionResult<(SolarPanel | GasEngine | EnergyStorage)[] | null>;
 }
 
+/**
+ * Gets generator by its type and id. User id given for restrict data access.
+ * @param type 
+ * @param id 
+ * @param uid 
+ * @returns 
+ */
 export async function getGeneratorById(type: "GAS" | "SOLAR" | "STORE", id: number, uid: number) {
      noStore();
      let table = DbNameExchange[type];
@@ -454,21 +565,35 @@ export async function getGeneratorById(type: "GAS" | "SOLAR" | "STORE", id: numb
      return res;
 }
 
-
+/**
+ * Changes generator active filed value by id and type.
+ * @param id 
+ * @param val 
+ * @param type 
+ */
 export async function changeGeneratorActivity(id: number, val: boolean, type: "GAS" | "SOLAR" | "STORE") {
      let table = DbNameExchange[type];
 
      const q = `UPDATE ${table} SET active = ${val ? "True" : "False"} WHERE id = ${id};`;
 
      const res = await exec_query(q);
-     revalidatePath("/simulate");
+     if (res.success)
+          revalidatePath("/simulate");
+     else
+          return res;
 }
 
-
+/**
+ * Execute simulation by collecting the active generators then calling the solver API and if the problem is feasable redirect to page results/show/new.
+ * @param uid 
+ * @param demand 
+ * @returns 
+ */
 export async function simulate(uid: number, demand: number[]) {
      const db_names = ["gas_engines", "solar_panel", "energy_storage"];
      const data: SolverData = { demand: demand, generators: { GAS: [], SOLAR: [], STORAGE: [] }, result: [] };
 
+     // Collect all active generator.
      const [GAS, SOLAR, STORAGE] = await Promise.all(db_names.map(e => {
           const q = `SELECT * FROM ${e} WHERE uid = ${uid} and active IS TRUE;`;
           return exec_query(q);
@@ -497,8 +622,11 @@ export async function simulate(uid: number, demand: number[]) {
      const result = await res.json() as { success: boolean, result: number[], exec_time: number };
 
      if (result.success) {
+          // Delete unsaved results.
           let q = `DELETE FROM results WHERE saved IS FALSE;`;
           await exec_query(q);
+
+          // Creates a result line in the db which can be loaded later and saved later. 
           data.result = result.result;
           q = `INSERT INTO results (uid, data, exec_time, saveDate) VALUES (${uid}, ${escape(JSON.stringify(data))}, ${result.exec_time}, NOW());`;
           const res = await exec_query(q);
@@ -511,11 +639,17 @@ export async function simulate(uid: number, demand: number[]) {
      return { error: "A feladat nem optimalizálható!" };
 }
 
+/**
+ * Save result by sets its saved field to TRUE and name field to the given value.
+ * @param id 
+ * @param prevState 
+ * @param formData 
+ * @returns 
+ */
+export async function saveResults(id: number, prevState: { message: string | null, error: string[] | null }, formData: FormData) {
 
-export async function saveResults(id: number, prevState: { message: string | null, error: string[] | null}, formData: FormData) {
-     
      const validatedName = z.string().max(50, "A név hossza maximum 50 karakter lehet!").nullable().safeParse(formData.get("resName"));
-     
+
      if (!validatedName.success) {
           console.log(validatedName.error.flatten().formErrors);
           return { message: "Hiba!", error: validatedName.error.flatten().formErrors };
@@ -530,6 +664,11 @@ export async function saveResults(id: number, prevState: { message: string | nul
      redirect(`/results/show/${id}`);
 }
 
+/**
+ * Deletes saved result by id.
+ * @param id 
+ * @returns 
+ */
 export async function deleteResult(id: number) {
      const q = `DELETE FROM results WHERE id = ${id};`;
      const res = await exec_query(q);
@@ -538,6 +677,11 @@ export async function deleteResult(id: number) {
      revalidatePath("/results");
 }
 
+/**
+ * Get user results by user id.
+ * @param uid 
+ * @returns 
+ */
 export async function getResults(uid: number) {
      noStore();
      const q = `SELECT id, name, saveDate, exec_time FROM results WHERE uid = ${uid} AND saved IS TRUE;`;
@@ -546,9 +690,14 @@ export async function getResults(uid: number) {
           return { success: false, result: null, message: "Adatbázis hiba!" } as DbActionResult<null>;
      }
      else
-          return res as DbActionResult<{ id: number, name: string, saveDate: Date, exec_time:number }[]>;
+          return res as DbActionResult<{ id: number, name: string, saveDate: Date, exec_time: number }[]>;
 }
 
+/**
+ * Creates data for charts. 
+ * @param data 
+ * @returns 
+ */
 async function createChartData(data: Results) {
      const charts_data: Charts = {
           id: data.id,
@@ -633,6 +782,11 @@ async function createChartData(data: Results) {
      return charts_data;
 }
 
+/**
+ * Helper function. Add arrays elements by index.
+ * @param arrays The arrays length must be the same.
+ * @returns 
+ */
 export async function sumArrayElementsByIndex(arrays: number[][]) {
      let res = arrays[0];
      if (arrays.length == 1)
@@ -648,6 +802,13 @@ export async function sumArrayElementsByIndex(arrays: number[][]) {
      return res;
 }
 
+/**
+ * Gets result by id.
+ * @param id 
+ * @param uid 
+ * @param role 
+ * @returns 
+ */
 export async function getResultById(id: number, uid: number, role: string) {
      const q = `SELECT * FROM results WHERE id = ${id}${role == "admin" ? "" : ` AND uid = ${uid}`};`;
      const res = await exec_query(q);
@@ -660,6 +821,11 @@ export async function getResultById(id: number, uid: number, role: string) {
      return res as DbActionResult<Charts>;
 }
 
+/**
+ * Get the newest result.
+ * @param uid 
+ * @returns 
+ */
 export async function getNewResult(uid: number) {
      const q = `SELECT * FROM results WHERE saved IS FALSE AND uid = ${uid} ORDER BY id DESC LIMIT 1;`;
      const res = await exec_query(q);

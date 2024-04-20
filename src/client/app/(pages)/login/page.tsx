@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { login } from '@/app/lib/actions';
 import { useEffect } from 'react';
 import { usePathname, useRouter, useSearchParams} from 'next/navigation';
-import { defaultLoginRedirect } from '../lib/definitions';
+import { defaultLoginRedirect } from '@/app/lib/definitions';
 import Image from 'next/image'
 import mainpic from '@/public/theme_pic.jpg';
 

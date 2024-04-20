@@ -13,7 +13,7 @@ export default async function Page({ params }: { params: { id: string } }) {
           <div className="container-fluid mt-4">
                <div className="row justify-content-center">
                     <div className="col-auto">
-                         <h2>{name} nevű napelem módosítása</h2>
+                         <h2><b>{name}</b> nevű napelem módosítása</h2>
                     </div>
                </div>
                <hr />

@@ -1,6 +1,9 @@
 import { z } from "zod";
-import { getUserById, isUserExists } from "./actions";
+import { getUserById, isUserExists } from "@/app/lib/actions";
 
+/**
+ * Validation schema for modifing user
+ */
 export const FormModifySchema = z.object({
      id: z.number(),
      username: z.string(),
@@ -28,6 +31,9 @@ export const FormModifySchema = z.object({
      }
 });
 
+/**
+ * Validation schema for adding new user
+ */
 export const FormSchema = z.object({
      username: z.string(),
      password: z.string(),
@@ -56,7 +62,9 @@ export const FormSchema = z.object({
      }
 });
 
-
+/**
+ * validation schema for gas engines
+ */
 export const GasEngineSchema = z.object({
      name: z.string().max(20, "Maximum 20 karakter hosszú név adható meg!"),
      gmax: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).min(0, "A Maximális termelésnek legalább 0-nak kell lennie!"),
@@ -87,6 +95,9 @@ export const GasEngineSchema = z.object({
      }
 });
 
+/**
+ * Validation schema for energy storages
+ */
 export const EnergyStorageSchema = z.object({
      name: z.string().max(20, "Maximum 20 karakter hosszú név adható meg!"),
      storage_min: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).min(0, "A minimális töltöttségi szint legalább 0!"),
@@ -125,6 +136,9 @@ export const EnergyStorageSchema = z.object({
      }
 });
 
+/**
+ * Validation schema for Solar panels
+ */
 export const SolarPanelSchema = z.object({
      name: z.string().max(20, "Maximum 20 karakter hosszú név adható meg!"),
      r_max: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).min(0),

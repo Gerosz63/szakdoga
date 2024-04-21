@@ -52,7 +52,7 @@ export default function Table({ users, uid }: { users: DbActionResult<User[]> | 
                     }
                     {
                          (users.success && users.result!.length == 0) &&
-                         <div className="row border rounded-4 shadow my-2 px-2 py-2 align-items-center">
+                         <div className="row border rounded-4 shadow my-2 px-2 py-2 align-items-center bg-light">
                               <div className="col text-center">
                                    Nincs találat...
                               </div>

@@ -5,8 +5,8 @@ import { EnergyStorage, EnergyStorageState } from "@/app/lib/definitions";
 import { useSession } from "next-auth/react";
 import { addNewEnergyStorage, modifyEnergyStorage } from "@/app/lib/actions";
 import { useState } from "react";
-import Element from "./formElement";
-import Submit from "./formSubmitElement";
+import Element from "@/app/ui/formElement";
+import Submit from "@/app/ui/formSubmitElement";
 
 
 export default function From({ action, energyStorage }: { action: "ADD" | "MODIFY", energyStorage?: EnergyStorage }) {
@@ -79,11 +79,11 @@ export default function From({ action, energyStorage }: { action: "ADD" | "MODIF
                </div>
                <Submit action={action} href="/simulate" inputChange={inputChange} />
                {
-                    state.errors.general &&
+                    state.errors!.general! &&
                     <div className="start-0 bottom-0 position-fixed w-100 row ps-3" tabIndex={-2}>
                          <div className="col">
                               {
-                                   state.errors.general.map((error: string) => (
+                                   state.errors!.general.map((error: string) => (
                                         <div role='alert' className="alert alert-danger mt-4" key={error}>
                                              {error}
                                         </div>

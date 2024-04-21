@@ -9,7 +9,7 @@ import { z } from "zod";
 import { SetDemandInCookie, simulate } from "@/app/lib/actions";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { LineChart } from "@mui/x-charts";
-import ErrorAlert from "./errorAlerts";
+import ErrorAlert from "@/app/ui/errorAlerts";
 
 
 export default function DemandManager({ uid, localDemand }: { uid: number, localDemand:string }) {

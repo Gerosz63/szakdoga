@@ -33,7 +33,7 @@ export async function addUser(prevState: UserState, formData: FormData) {
           return {
                errors: dataValidated.error.flatten().fieldErrors,
                message: 'Hiányos adatok!',
-          };
+          } as UserState;
      }
 
      const data = dataValidated.data;
@@ -41,7 +41,7 @@ export async function addUser(prevState: UserState, formData: FormData) {
      const res = await exec_query(qstr);
      if (!res.success) {
           console.log(res?.message);
-          return { errors: { "general": ["Adatbázis hiba!"] }, message: "Adatbázis hiba! A felhasználó hozzáadása sikertelen!" };
+          return { errors: { "general": ["Adatbázis hiba!"] }, message: "Adatbázis hiba! A felhasználó hozzáadása sikertelen!" } as UserState;
      }
      revalidatePath('/usermanager');
      redirect('/usermanager');
@@ -67,14 +67,14 @@ export async function modifyUser(uid: number, prevState: UserState, formData: Fo
           return {
                errors: dataValidated.error.flatten().fieldErrors,
                message: 'Hiányos adatok!',
-          };
+          } as UserState;
      }
      const data = dataValidated.data;
      const q = `UPDATE user SET username = ${escape(data.username)}${data.password !== null ? ", password = '" + hash(data.password, 10) + "'" : ""}${data.role !== null ? ", role =" + escape(data.role) : ""} WHERE id = ${uid};`;
      const res = await exec_query(q);
      if (!res.success) {
           console.log(res?.message);
-          return { message: "Adatbázis hiba! A felhasználó módosítása sikertelen!" };
+          return { message: "Adatbázis hiba! A felhasználó módosítása sikertelen!", errors: { general: ["Adatbázis hiba! A felhasználó módosítása sikertelen!"] } } as UserState;
      }
      revalidatePath('/');
      redirect('/usermanager');
@@ -130,6 +130,22 @@ export async function listUsers(search: string = "", page: number = 1, limit: nu
      }
      return { success: true, result: res.result as Array<User> } as DbActionResult<User[]>;
 }
+
+/**
+ * Returns the number of pages needed for display all users.
+ * @param limit Maximum number of users displayed on a page
+ * @returns 
+ */
+export async function getUserMaxPage(limit: number = 10) {
+     noStore();
+     const q = `SELECT CEIL(COUNT(*) / ${limit}) as maxPage FROM user;`;
+     const res = await exec_query(q);
+     if (res.success) {
+          return {success:true, result: res.result[0].maxPage} as DbActionResult<number>;
+     }
+     return res as DbActionResult<null>;
+}
+
 
 /**
  * Returns a user by its id.
@@ -239,7 +255,7 @@ export async function addNewGasEngine(uid: number, prevState: GasEngineState, fo
           return {
                errors: validatedData.error.flatten().fieldErrors,
                message: 'Hiányos adatok!',
-          };
+          } as GasEngineState;
      }
 
      const data = validatedData.data;
@@ -251,7 +267,7 @@ export async function addNewGasEngine(uid: number, prevState: GasEngineState, fo
           return {
                errors: { general: ["Adatbázis hiba!"] },
                message: "Adatbázis hiba!"
-          };
+          } as GasEngineState;
      }
 
      revalidatePath("/simulate");
@@ -282,7 +298,7 @@ export async function modifyGasEngine(id: number, prevState: GasEngineState, for
           return {
                errors: validatedData.error.flatten().fieldErrors,
                message: 'Hiányos adatok!',
-          };
+          } as GasEngineState;
      }
 
      const data = validatedData.data;
@@ -294,7 +310,7 @@ export async function modifyGasEngine(id: number, prevState: GasEngineState, for
           return {
                errors: { general: ["Adatbázis hiba!"] },
                message: "Adatbázis hiba!"
-          };
+          } as GasEngineState;
      }
 
      revalidatePath("/simulate");
@@ -311,8 +327,7 @@ export async function deleteGasEngine(id: number) {
      const res = await exec_query(q);
      if (res.success)
           revalidatePath("/simulate");
-     else
-          return res;
+     return res;
 }
 
 /**
@@ -342,7 +357,7 @@ export async function addNewEnergyStorage(uid: number, prevState: EnergyStorageS
           return {
                errors: validatedData.error.flatten().fieldErrors,
                message: 'Hiányos adatok!',
-          };
+          } as EnergyStorageState;
      }
 
      const data = validatedData.data;
@@ -354,7 +369,7 @@ export async function addNewEnergyStorage(uid: number, prevState: EnergyStorageS
           return {
                errors: { general: ["Adatbázis hiba!"] },
                message: "Adatbázis hiba!"
-          };
+          } as EnergyStorageState;
      }
 
      revalidatePath("/simulate");
@@ -388,7 +403,7 @@ export async function modifyEnergyStorage(id: number, prevState: EnergyStorageSt
           return {
                errors: validatedData.error.flatten().fieldErrors,
                message: 'Hiányos adatok!',
-          };
+          } as EnergyStorageState;
      }
 
      const data = validatedData.data;
@@ -400,7 +415,7 @@ export async function modifyEnergyStorage(id: number, prevState: EnergyStorageSt
           return {
                errors: { general: ["Adatbázis hiba!"] },
                message: "Adatbázis hiba!"
-          };
+          } as EnergyStorageState;
      }
 
      revalidatePath("/simulate");
@@ -417,8 +432,7 @@ export async function deleteEnergyStorage(id: number) {
      const res = await exec_query(q);
      if (res.success)
           revalidatePath("/simulate");
-     else
-          return res;
+     return res;
 }
 
 
@@ -453,7 +467,7 @@ export async function addNewSolarPanel(uid: number, prevState: SolarPanelState, 
           return {
                errors: validatedData.error.flatten().fieldErrors,
                message: 'Hiányos adatok!',
-          };
+          } as SolarPanelState;
      }
 
      const data = validatedData.data;
@@ -465,7 +479,7 @@ export async function addNewSolarPanel(uid: number, prevState: SolarPanelState, 
           return {
                errors: { general: ["Adatbázis hiba!"] },
                message: "Adatbázis hiba!"
-          };
+          } as SolarPanelState;
      }
 
      revalidatePath("/simulate");
@@ -502,7 +516,7 @@ export async function modifySolarPanel(id: number, prevState: SolarPanelState, f
           return {
                errors: validatedData.error.flatten().fieldErrors,
                message: 'Hiányos adatok!',
-          };
+          } as SolarPanelState;
      }
 
      const data = validatedData.data;
@@ -514,7 +528,7 @@ export async function modifySolarPanel(id: number, prevState: SolarPanelState, f
           return {
                errors: { general: ["Adatbázis hiba!"] },
                message: "Adatbázis hiba!"
-          };
+          } as SolarPanelState;
      }
 
      revalidatePath("/simulate");
@@ -531,8 +545,7 @@ export async function deleteSolarPanel(id: number) {
      const res = await exec_query(q);
      if (res.success)
           revalidatePath("/simulate");
-     else
-          return res;
+     return res;
 }
 
 /**

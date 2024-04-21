@@ -1,5 +1,6 @@
 'use server';
 import mysql from 'mysql2/promise';
+import { DbActionResult } from './definitions';
 
 
 /**
@@ -22,9 +23,9 @@ export async function exec_query(query: string) {
           else
                await db.execute(query);
           await db.end();
-          return { success: true, result: result };
+          return { success: true, result: result } as DbActionResult<any>;
      } catch (error) {
           console.log(error);
-          return { success: false, message: `Adatbázis hiba.`, result: null };
+          return { success: false, message: `Adatbázis hiba.`, result: null } as DbActionResult<null>;
      }
 }

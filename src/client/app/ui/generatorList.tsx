@@ -1,28 +1,34 @@
 "use client";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Element from "./generatorElement";
+import Element from "@/app/ui/generatorElement";
 import Link from "next/link";
-import { DbActionResult, EnergyStorage, GasEngine, SolarPanel } from "../lib/definitions";
+import { DbActionResult, EnergyStorage, GasEngine, SolarPanel } from "@/app/lib/definitions";
 import { useState } from "react";
-import { deleteEnergyStorage, deleteGasEngine, deleteSolarPanel } from "../lib/actions";
+import { deleteEnergyStorage, deleteGasEngine, deleteSolarPanel } from "@/app/lib/actions";
+import ErrorAlert from "@/app/ui/errorAlerts";
 
 export default function List({ title, type, elements }: { title: string, type: "GAS" | "SOLAR" | "STORE", elements: DbActionResult<(SolarPanel | GasEngine | EnergyStorage)[]> }) {
      const [state, setState] = useState({ id: -1, name: "" });
+     const [errorState, SetError] = useState({ success: true, message: "" });
 
-     function deleteGenerator() {
+     async function deleteGenerator() {
+          let res:DbActionResult<null>|DbActionResult<any> = {success:false, result:null, message:"Hiba! Ismeretlen generátor típus!"};
           switch (type) {
                case "GAS":
-                    deleteGasEngine(state.id);
+                    res = await deleteGasEngine(state.id);
                     break;
                case "SOLAR":
-                    deleteSolarPanel(state.id);
+                    res = await deleteSolarPanel(state.id);
                     break;
                case "STORE":
-                    deleteEnergyStorage(state.id);
+                    res = await deleteEnergyStorage(state.id);
                     break;
                default:
                     break;
+          }
+          if (!res?.success) {
+               SetError({ success: false, message: res?.message! });
           }
      }
 
@@ -49,7 +55,7 @@ export default function List({ title, type, elements }: { title: string, type: "
                default:
                     return "gázmotort";
           }
-     }; 
+     };
 
      return (
           <>
@@ -67,7 +73,7 @@ export default function List({ title, type, elements }: { title: string, type: "
                          {
                               elements.success && elements.result!.length as number !== 0 ?
                                    elements.result!.map((e) =>
-                                        <Element key={e.id} generator={e} type={type} callback={setState}/>
+                                        <Element key={e.id} generator={e} type={type} callback={setState} />
                                    ) :
                                    <div className="text-center">Nincs még ilyen résztvevőd!</div>
                          }
@@ -87,6 +93,10 @@ export default function List({ title, type, elements }: { title: string, type: "
                          </div>
                     </div>
                </div>
+               {
+                    !errorState.success &&
+                    <ErrorAlert callback={SetError} text={errorState.message} />
+               }
           </>
      );
 }

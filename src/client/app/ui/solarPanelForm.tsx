@@ -125,11 +125,11 @@ export default function Form({ action, solarPanel }: { action: "ADD" | "MODIFY",
                </div>
                <Submit action={action} href="/simulate" inputChange={inputChange} />
                {
-                    state.errors.general &&
+                    state.errors!.general &&
                     <div className="start-0 bottom-0 position-fixed w-100 row ps-3" tabIndex={-2}>
                          <div className="col">
                               {
-                                   state.errors.general.map((error: string) => (
+                                   state.errors!.general.map((error: string) => (
                                         <div role='alert' className="alert alert-danger mt-4" key={error}>
                                              {error}
                                         </div>

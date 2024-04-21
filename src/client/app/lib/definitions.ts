@@ -243,60 +243,75 @@ export type UserState = {
 };
 
 /**
+ * Helper type for GasEngineState
+ */
+export type GasEngineStateError = {
+     name?: string[];
+     gmax?: string[];
+     gplusmax?: string[];
+     gminusmax?: string[];
+     cost?: string[];
+     g0?: string[];
+     general?: string[];
+}
+
+/**
  * Form state type for gas engines
  */
 export type GasEngineState = {
-     errors?: {
-          name?: string[];
-          gmax?: string[];
-          gplusmax?: string[];
-          gminusmax?: string[];
-          cost?: string[];
-          g0?: string[];
-          general?: string[];
-     };
+     errors?: GasEngineStateError;
      message?: string | null;
 };
+
+/**
+ * Helper type for EnergyStorageState
+ */
+export type EnergyStorageStateError = {
+     name?: string[];
+     storage_min?: string[];
+     storage_max?: string[];
+     charge_max?: string[];
+     discharge_max?: string[];
+     charge_loss?: string[];
+     discharge_loss?: string[];
+     charge_cost?: string[];
+     discharge_cost?: string[];
+     s0?: string[];
+     general?: string[];
+}
 
 /**
  * Form state type for energy storages
  */
 export type EnergyStorageState = {
-     errors?: {
-          name?: string[];
-          storage_min?: string[];
-          storage_max?: string[];
-          charge_max?: string[];
-          discharge_max?: string[];
-          charge_loss?: string[];
-          discharge_loss?: string[];
-          charge_cost?: string[];
-          discharge_cost?: string[];
-          s0?: string[];
-          general?: string[];
-     };
+     errors?: EnergyStorageStateError;
      message?: string | null;
 };
+
+/**
+ * Helper type for SolarPanelState
+ */
+export type SolarPanelStateError = {
+     name?: string[];
+     r_max?: string[];
+     delta_r_plus_max?: string[];
+     delta_r_minus_max?: string[];
+     cost?: string[];
+     r0?: string[];
+     shift_start?: string[];
+     exp_v?: string[];
+     range?: string[];
+     value_at_end?: string[];
+     addNoise?: string[];
+     seed?: string[];
+     general?: string[];
+}
 
 /**
  * Form state type for solar panels
  */
 export type SolarPanelState = {
-     errors?: {
-          name?: string[];
-          r_max?: string[];
-          delta_r_plus_max?: string[];
-          delta_r_minus_max?: string[];
-          cost?: string[];
-          r0?: string[];
-          shift_start?: string[];
-          exp_v?: string[];
-          range?: string[];
-          value_at_end?: string[];
-          addNoise?: string[];
-          seed?: string[];
-          general?: string[];
-     };
+     errors?: SolarPanelStateError;
      message?: string | null;
 };
 

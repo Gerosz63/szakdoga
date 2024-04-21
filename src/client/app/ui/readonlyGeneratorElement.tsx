@@ -32,21 +32,23 @@ export default function Element({ generator, type }: { generator: EnergyStorage 
                <div className="col-lg-auto col-12 text-end">
                     <button onClick={(e) => setState(!state)} className={clsx("btn", { "btn-primary": !state }, { "btn-outline-primary": state })} title="Részletek" data-bs-toggle="collapse" data-bs-target={"#" + elementId} aria-expanded="false" aria-controls={elementId}><FontAwesomeIcon icon={state ? faChevronDown : faChevronUp} /></button>
                </div>
-               <div id={elementId} className="collapse">
-                    <hr />
-                    <ul className="list-group m-3">
-                         {
-                              Object.keys(generator).filter((k) => !["id", "uid", "active", "name"].includes(k)).map((k) => {
-                                   let key = k as keyof typeof generator;
-                                   return (
-                                        <li key={k} className="list-group-item d-flex justify-content-between align-items-center">
-                                             {getName(key)}
-                                             <span className="badge text-bg-secondary rounded-2">{generator[key] === null ? "-" : generator[key]}</span>
-                                        </li>
-                                   );
-                              })
-                         }
-                    </ul>
+               <div>
+                    <div id={elementId} className="collapse">
+                         <hr />
+                         <ul className="list-group m-3">
+                              {
+                                   Object.keys(generator).filter((k) => !["id", "uid", "active", "name"].includes(k)).map((k) => {
+                                        let key = k as keyof typeof generator;
+                                        return (
+                                             <li key={k} className="list-group-item d-flex justify-content-between align-items-center">
+                                                  {getName(key)}
+                                                  <span className="badge text-bg-secondary rounded-2">{generator[key] === null ? "-" : generator[key]}</span>
+                                             </li>
+                                        );
+                                   })
+                              }
+                         </ul>
+                    </div>
                </div>
           </div>
      );

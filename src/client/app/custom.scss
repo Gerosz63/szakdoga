@@ -2,49 +2,47 @@ $lightgreen: #3fde94;
 $lightgrey: #f0f4f9;
 $darkblue: #434b54;
 $greenblue: #448a7e;
-$primary: #2196F3 !default;
+$primary: #2196f3 !default;
 $secondary: $darkblue !default;
-$success: #4CAF50 !default;
+$success: #4caf50 !default;
 //$warning: #3482f7 !default;
-
 
 $font-size-base: 1.15rem !default;
 
 .text-shadow {
-     text-shadow: 5px 5px 10px black;
+  text-shadow: 5px 5px 10px black;
 }
 
-
-$mycolors : (
-     "green": $lightgreen,
-     "grey": $lightgrey,
-     "darkblue" : $darkblue,
-     "greenblue" : $greenblue,
-     "white": #fff
+$mycolors: (
+  "green": $lightgreen,
+  "grey": $lightgrey,
+  "darkblue": $darkblue,
+  "greenblue": $greenblue,
+  "white": #fff,
 );
 
 @each $type, $color in $mycolors {
-     .mybg-#{$type} {
-          background-color: $color;
-     }
-     .mytext-#{$type} {
-          color: $color;
-     }
+  .mybg-#{$type} {
+    background-color: $color;
+  }
+  .mytext-#{$type} {
+    color: $color;
+  }
 }
 
 nav .navbar-nav .nav-link.active {
-     background-color: $darkblue;
-     color: $lightgrey;
+  background-color: $darkblue;
+  color: $lightgrey;
 }
 
 .cursor-pointer {
-     cursor: pointer;
+  cursor: pointer;
 }
 
 label.required::after {
-     content: "*";
-     color: red;
-     font-weight: bold;
+  content: "*";
+  color: red;
+  font-weight: bold;
 }
 
-@import '~bootstrap/scss/bootstrap.scss';
+@import "~bootstrap/scss/bootstrap.scss";

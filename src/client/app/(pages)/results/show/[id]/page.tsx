@@ -25,7 +25,7 @@ export default async function Page({ params }: { params: { id: string } }) {
      let energyStorages: EnergyStorage[] = [];
      let solarPanels: SolarPanel[] = [];
      if (data.success) {
-          const shorts: ("GAS" | "SOLAR" | "STORAGE")[] = ["GAS", "STORAGE", "SOLAR"];
+          const shorts: ("GAS" | "SOLAR" | "STORAGE")[] = ["STORAGE", "GAS", "SOLAR"];
           for (let i = 0; i < 3; i++) {
                const key: "GAS" | "SOLAR" | "STORAGE" = shorts[i];
                if (data.result!.elementTypes[key]) {
@@ -102,7 +102,7 @@ export default async function Page({ params }: { params: { id: string } }) {
                                                   <div className="bg-light col-auto border-start border-end px-2 rounded-3 shadow py-2"><h3 className="p-0 m-0">Gázmotorok eredményei</h3></div>
                                                   <div className="col"><hr /></div>
                                              </div>
-                                             <div style={{ height: "400px" }} className="mybg-white rounded-4">
+                                             <div style={{ height: "400px" }} className="mybg-white rounded-4 ">
                                                   <Suspense fallback={<ChartSkeleton />}>
                                                        <ElementChart data={{ xLabels: data.result!.labels, chartdata: data.result!.elements.GAS.map((e) => { return { name: e.name, data: dublicateFirstItem(e.data) }; }) }} />
                                                   </Suspense>

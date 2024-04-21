@@ -55,21 +55,23 @@ export default function Element({ generator, type, callback }: { generator: Ener
                          </button>
                     </div>
                </div>
-               <div id={elementId} className="collapse">
-                    <hr />
-                    <ul className="list-group m-3">
-                         {
-                              Object.keys(generator).filter((k) => !["id", "uid", "active", "name"].includes(k)).map((k) => {
-                                   let key = k as keyof typeof generator;
-                                   return (
-                                        <li key={k} className="list-group-item d-flex justify-content-between align-items-center">
-                                             {getName(key)}
-                                             <span className="badge text-bg-secondary rounded-2">{generator[key] === null ? "-" : generator[key]}</span>
-                                        </li>
-                                   );
-                              })
-                         }
-                    </ul>
+               <div>
+                    <div id={elementId} className="collapse">
+                         <hr />
+                         <ul className="list-group m-3">
+                              {
+                                   Object.keys(generator).filter((k) => !["id", "uid", "active", "name"].includes(k)).map((k) => {
+                                        let key = k as keyof typeof generator;
+                                        return (
+                                             <li key={k} className="list-group-item d-flex justify-content-between align-items-center">
+                                                  {getName(key)}
+                                                  <span className="badge text-bg-secondary rounded-2">{generator[key] === null ? "-" : generator[key]}</span>
+                                             </li>
+                                        );
+                                   })
+                              }
+                         </ul>
+                    </div>
                </div>
           </div>
      );

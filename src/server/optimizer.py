@@ -3,16 +3,17 @@ from scipy.optimize import linprog
 import math
 import time
 
+# Abstract class for VPP elements
 class VPPItem:
     def lp_get_constraints(self, T:int) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         return np.zeros((1,T)), np.zeros(1), np.zeros((1,T)), np.zeros(1) # leq mm, leq v, eq m, eq v 
     def lp_get_cost(self, T:int) -> np.ndarray:
         return np.zeros(T)
     
-    
+# GAS ENGINE
 class VPPGasEngine(VPPItem):
     def __init__(self, g_max:float, g_plus_max:float, g_minus_max:float, cost:float, g0:float|None = None):
-        # Ellenőrzések:
+        # Validation:
         if g_max < 0. or g_plus_max < 0. or g_minus_max < 0.:
             raise Exception("A g_max, g_plus_max, g_minus_max értékek nem lehetnek 0-nál kisebb értékek!")
         
@@ -21,7 +22,7 @@ class VPPGasEngine(VPPItem):
         self.g_minus_max = g_minus_max
         self.cost = cost
 
-        # Amennyiben a g0 nem megfelelő értékű javítjuk azt
+        # Correct g0
         if g0 != None:
             if g0 < 0:
                 g0 = 0
@@ -48,11 +49,13 @@ class VPPGasEngine(VPPItem):
     def lp_get_cost(self, T:int) -> np.ndarray:
         return np.full(T, self.cost, dtype=np.float32)
 
+
+# ENERGY STORAGE
 class VPPEnergyStorage(VPPItem):
     def __init__(self,storage_min:float, storage_max:float, charge_max:float,
                  discharge_max:float, charge_loss:float, discharge_loss:float, charge_cost:float, discharge_cost:float, s0:float|None = None):
         
-        # Ellenőrzések:
+        # Validation:
         if storage_min < 0. or storage_max < 0. or charge_max < 0. or discharge_max < 0.:
             raise Exception("A storage_min, storage_max, charge_max, discharge_max értékek nem lehetnek 0-nál kisebb értékek.")
         elif storage_max < storage_min:
@@ -69,7 +72,7 @@ class VPPEnergyStorage(VPPItem):
         self.charge_cost = charge_cost
         self.discharge_cost = discharge_cost
 
-        # A kezdőérték beállítása
+        # Setting s0
         if s0 == None:
             s0 = storage_min
         else:
@@ -80,7 +83,7 @@ class VPPEnergyStorage(VPPItem):
         self.s0 = s0
 
     '''
-    A kényszerek vektora:
+    Constrains vector structure:
 
     s(0)
     s(1)
@@ -99,14 +102,14 @@ class VPPEnergyStorage(VPPItem):
         dm, dv = LinearConstraints.generate_constraints_min_max(T, 0, self.discharge_max)
         m, v = MatrixMerger.MergeDiff_LP_Constraints([sm, cm, dm], [sv, cv, dv])
 
-        # Kezdő érték beállítása, ha van
+        # Setting base value if exists
         eqm = np.zeros((1, 3 * T), dtype=np.float32)
         eqm[0, 0] = 1
         eqm[0, T] = -1. + self.charge_loss
         eqm[0, 2*T] = 1. + self.discharge_loss
         eqv = np.array([self.s0], dtype=np.float32)
 
-        # A kontinuitás felállítása
+        # Contiunity
         contm, contv = LinearConstraints.generate_constraints_continuity(T, self.charge_loss, self.discharge_loss)
         eqm = np.concatenate([eqm, contm], axis=0)
         eqv = np.concatenate([eqv, contv])
@@ -115,9 +118,10 @@ class VPPEnergyStorage(VPPItem):
     def lp_get_cost(self, T: int) -> np.ndarray:
         return np.concatenate([np.zeros(T, dtype=np.float32), np.full(T, (1-self.charge_loss)*self.charge_cost, dtype=np.float32), np.full(T,(1+self.discharge_loss)*self.discharge_cost, dtype=np.float32)], axis=0)
 
+# SOLAR PANEL
 class VPPSolarPanel(VPPItem):
     def __init__(self, r_max:float, delta_r_plus_max:float, delta_r_minus_max:float, cost:float, T:int, r0:float|None = None, shift_start:int=0, exp_v:float=13, range:float=8, value_at_end:float=0.001, addNoise:bool=True, seed=None):
-        # Ellenőrzések:
+        # Validation:
         if delta_r_plus_max < 0. or r_max < 0. or delta_r_minus_max < 0. or T < 0:
             raise Exception("A delta_r_plus_max, r_max, delta_r_minus_max, T értékek nem lehetnek 0-nál kisebbek!")
 
@@ -138,7 +142,6 @@ class VPPSolarPanel(VPPItem):
         y = (y - value_at_end) / (np.max(y) - value_at_end)
         y[y < 0] = 0
         
-        # A kezdő intervallum beállítása, ha helytelenül lenne megadva
         if shift_start < 0:
             shift_start = 0
         elif shift_start >= T:
@@ -171,9 +174,6 @@ class VPPSolarPanel(VPPItem):
         v[:T] = self.r_max_values
         
         mmm, mmv = LinearConstraints.generate_constraints_min_max_time(T, self.delta_r_minus_max, self.delta_r_plus_max)
-
-
-        # Kezdő érték beállítása, ha van
         
         if self.r0 == None:
             m, v = MatrixMerger.Merge_LP_Constraints([m, mmm], [v, mmv])
@@ -188,6 +188,7 @@ class VPPSolarPanel(VPPItem):
     def lp_get_cost(self, T:int) -> np.ndarray: 
         return np.full(T, self.cost)
 
+# If generator values are already given (future development)
 class VPPRenewable(VPPItem):
     def __init__(self, e_max:np.ndarray, cost:float, label:str):
         aclist = ["SP", "WP"] # solar power, wind power
@@ -206,18 +207,20 @@ class VPPRenewable(VPPItem):
     def lp_get_cost(self, T:int) -> np.ndarray:
         return np.full(T, self.cost)
 
-
+# Constrain creator helper class
 class LinearConstraints:
 
+    # Creates a normal min-max constrains
     @staticmethod
-    def generate_constraints_min_max(T:int, min:float, max:float) -> tuple[np.ndarray, np.ndarray]: #sima korlátosság
+    def generate_constraints_min_max(T:int, min:float, max:float) -> tuple[np.ndarray, np.ndarray]:
         A = np.concatenate((np.eye(T),np.diag(np.full((T,), -1))),axis=0)
         b = np.concatenate([np.full(T,max), np.full(T,-1 * min)])
         return A, b
 
 
+    # Creates a differental constrains with this we can determine the min-max difference between the neigbour time intervals
     @staticmethod
-    def generate_constraints_min_max_time(T:int, min:float, max:float) -> tuple[np.ndarray, np.ndarray]: #i,t időpillanatból kivonjuk az i,t-1 időpillanatot
+    def generate_constraints_min_max_time(T:int, min:float, max:float) -> tuple[np.ndarray, np.ndarray]:
         min_matrix = np.zeros((T-1, T))
         np.fill_diagonal(min_matrix[:,:-1], 1)
         np.fill_diagonal(min_matrix[:,1:], -1)
@@ -229,7 +232,8 @@ class LinearConstraints:
         A = np.concatenate((min_matrix,max_matrix),axis=0)
         b = np.concatenate((np.full(T - 1, min), np.full(T - 1,max)))
         return A, b
-
+    
+    # Creates the continuity constrains
     @staticmethod
     def generate_constraints_continuity(T:int, charge_loss:float ,discharge_loss:float) -> tuple[np.ndarray, np.ndarray]:
         contm = np.zeros((T - 1, 3 * T), dtype=np.float32).reshape(-1)
@@ -241,33 +245,31 @@ class LinearConstraints:
         contv = np.zeros(T-1, dtype=np.float32)
         return contm, contv
 
+# Class for merge different constrains 
 class MatrixMerger:
-    # =====================================
-    # LP kényszerek
-    # =====================================
-    '''A VPP részvevőinek kényszerfeltételik és költség függvényeik összefűzését végző függvény'''
+    # Main function to merge all constrains and cost functions
     @staticmethod
     def MergeAllVPPItem_LP_ConstraintsAndCost(itemList:list[VPPItem], d:np.ndarray, l:np.ndarray, T:int) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
 
-        # A <= kényszerek mátrixa és vektora
+        # The <= constrains
         m = list()
         v = list()
 
-        cf = list() #költség függvény
+        # Cost
+        cf = list() 
 
-        # Termelési kényszer sum(gi,t) +  sum(di,t) ...
+        # The demand 
         eqm = 0
         eqv = d+l
 
-        # Az = kényszerek mátrixa és vektora
+        # The = constrains
         eqml = list()
         eqvl = list()
 
 
-        # Végi megyünk a VPP részvevőkön
         for e in itemList:
-            ma, ve, sm, sv = e.lp_get_constraints(T) # Elkérjük a kényszeriket
-            cf.append(e.lp_get_cost(T)) # a költség függvényt
+            ma, ve, sm, sv = e.lp_get_constraints(T)
+            cf.append(e.lp_get_cost(T))
 
             if (ma is not None):
                 m.append(ma)
@@ -293,8 +295,7 @@ class MatrixMerger:
 
 
                 
-            # összerakjuk a "Energiaigény és összenergia" pont alatti kényszert
-            # A tárolók esetén figyelni kell, hogy csak a d(j,t) és c(j,t) szerepel a képletben így a többit ki kell nullázni
+            # Creates the constrains for the demand
             if type(eqm) == int:
                 if isinstance(e, VPPGasEngine) or isinstance(e, VPPSolarPanel) or isinstance(e, VPPRenewable):
                     eqm = np.eye(T, T, dtype=np.float32)
@@ -312,25 +313,19 @@ class MatrixMerger:
 
 
 
-        resm, resv = MatrixMerger.MergeDiff_LP_Constraints(m, v) # összefűzzük a <= típusú kényszereket
-        eqmp, eqvp = MatrixMerger.MergeDiff_LP_Constraints(eqml, eqvl) # összefűzzük a = típusú kényszereket
+        resm, resv = MatrixMerger.MergeDiff_LP_Constraints(m, v)
+        eqmp, eqvp = MatrixMerger.MergeDiff_LP_Constraints(eqml, eqvl)
         
-        # Az '=' típusú kényszerek összeszerelése
         eqm = np.concatenate([eqm, eqmp], axis=0)
         eqv = np.concatenate([eqv, eqvp], axis=0)
 
 
-        # A mátrixok optimalizálása
         eqm, eqv = MatrixMerger.Optimaze_LP_MatrixesAndVectors(eqm, eqv)
         resm, resv = MatrixMerger.Optimaze_LP_MatrixesAndVectors(resm, resv)
         
         return resm, resv, np.concatenate(cf, axis=0), eqm, eqv
     
-    '''
-    A függvény optimalizálja a megadott kényszer mátrixot:
-        - Kiveszi belőle duplikált sorokat
-        - Megszünteti a csupa nulla sorokat (mind a mátrixban 0 van mind a vektorban)
-    '''
+    # Function which optimize the constrians by removing full 0 and duplicated lines
     @staticmethod
     def Optimaze_LP_MatrixesAndVectors(m:np.ndarray, v:np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         data = np.concatenate([m, v.reshape(-1, 1)], axis=1)
@@ -340,6 +335,7 @@ class MatrixMerger:
         v = uniques[:,-1].reshape(-1)
         return m, v
 
+    # Merge matrixes by putting them in a matrix diagonal places 
     @staticmethod
     def MergeDiff_LP_Constraints(m:list[np.ndarray], v:list[np.ndarray]) -> tuple[np.ndarray, np.ndarray]:
         resv = np.concatenate(v, axis=0)
@@ -351,21 +347,22 @@ class MatrixMerger:
             newElem = np.concatenate([np.zeros((newShape[0], resShape[1]), dtype=np.float32), e], axis=1) # az új mátrix bal oldalát is feltöltjük 0-ákkal
             resm = np.concatenate([resm, newElem], axis=0)# A két mátrixot össze fűzzük
         return resm, resv
-    '''
-    Ha egy VPP résztvevőnek több kényszerfeltétele van akkor azokat lehet a függvény segítségével egyesíteni
-    A függvény az 1 koordináta alapján fűzi össze őket
-    '''
+   
+    # Simple merge matrixes and vectors
     @staticmethod
     def Merge_LP_Constraints(matrix:list[np.ndarray], vector:list[np.ndarray]) -> tuple[np.ndarray, np.ndarray]:
         m = np.concatenate(matrix, axis=0)
         v = np.concatenate(vector, axis=0)
         return m, v
 
+# Solver function 
 def solve(items:list[VPPItem], T:int, l:np.ndarray, d:np.ndarray, debug=False, tofile=None, checker=None):
      st = time.time()
      cm, cv, cf, sc, scv = MatrixMerger.MergeAllVPPItem_LP_ConstraintsAndCost(items, d, l, T)
      ed = time.time()
      res = linprog(cf, A_ub=cm, b_ub=cv, A_eq=sc, b_eq=scv)
+
+     # Debug mode. In this mode the functuion prints all the constrains
      if debug:
           if checker is not None:
                checkres_leq = np.sum(cm * checker, axis=1) <= cv

@@ -46,9 +46,9 @@ export default function Pagination({ maxpage }: { maxpage: number }) {
      }
 
      return (
-          <nav aria-label="Page navigation">
+          <nav aria-label="Page navigation mybg-green">
                <ul className="pagination justify-content-end">
-                    <li className="page-item"><button onClick={(e) => changePage(current_page - 1)} className={clsx("page-link", { "disabled": current_page == 1 })}>Previous</button></li>
+                    <li className="page-item"><button onClick={(e) => changePage(current_page - 1)} className={clsx("page-link", { "disabled": current_page == 1 })}>Elöző</button></li>
                     <li className="page-item"><button onClick={(e) => changePage(pagenumbers[0])} className={clsx("page-link", { "active": pagenumbers[0] == current_page })}>{pagenumbers[0]}</button></li>
                     {
                          pagenumbers.length > 1 &&
@@ -58,7 +58,7 @@ export default function Pagination({ maxpage }: { maxpage: number }) {
                          pagenumbers.length > 2 &&
                          <li className="page-item"><button onClick={(e) => changePage(pagenumbers[2])} className={clsx("page-link", { "active": pagenumbers[2] == current_page })}>{pagenumbers[2]}</button></li>
                     }
-                    <li className="page-item"><button onClick={(e) => changePage(current_page + 1)} className={clsx("page-link", { "disabled": current_page == maxpage })}>Next</button></li>
+                    <li className="page-item"><button onClick={(e) => changePage(current_page + 1)} className={clsx("page-link", { "disabled": current_page == maxpage })}>Következő</button></li>
                </ul>
           </nav>
      );

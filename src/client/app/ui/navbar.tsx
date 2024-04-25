@@ -37,7 +37,7 @@ export default function Navbar() {
           <nav className="navbar navbar-expand-lg mybg-green">
                <div className="container-fluid">
                     <Link className="navbar-brand fs-3 text-dark p-2 rounded-4" href="">
-                         OTIMIZER
+                         OPTIMIZER
                     </Link>
                     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                          <span className="navbar-toggler-icon"></span>

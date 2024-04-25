@@ -668,9 +668,10 @@ export async function saveResults(id: number, prevState: { message: string | nul
           return { message: "Hiba!", error: validatedName.error.flatten().formErrors };
      }
 
-     const q = `UPDATE results SET saved = TRUE, name = ${escape(validatedName.data)} WHERE id = ${id} AND saved IS FALSE;`;
+     const q = `UPDATE results SET saved = TRUE, name = ${escape(validatedName.data)} WHERE id = ${id};`;
      const res = await exec_query(q);
      if (!res.success) {
+          console.log("Hiba!");
           return { message: "Hiba!", error: ["Adatbázis hiba!"] };
      }
      revalidatePath("/results");

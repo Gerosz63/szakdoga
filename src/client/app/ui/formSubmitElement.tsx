@@ -3,7 +3,7 @@ import Link from "next/link";
 
 export default function Submit({ action, inputChange, href }: { action: "MODIFY" | "ADD", inputChange: () => void, href: string }) {
      return (
-          <div className="row mt-3 justify-content-between">
+          <div className="row mt-3 mb-5 justify-content-between">
                <div className="col-auto">
                     <Link className="btn btn-secondary" href={href}>Vissza</Link>
                </div>

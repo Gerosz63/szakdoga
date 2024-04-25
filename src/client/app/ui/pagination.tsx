@@ -46,7 +46,7 @@ export default function Pagination({ maxpage }: { maxpage: number }) {
      }
 
      return (
-          <nav aria-label="Page navigation mybg-green">
+          <nav aria-label="Page navigation">
                <ul className="pagination justify-content-end">
                     <li className="page-item"><button onClick={(e) => changePage(current_page - 1)} className={clsx("page-link", { "disabled": current_page == 1 })}>Elöző</button></li>
                     <li className="page-item"><button onClick={(e) => changePage(pagenumbers[0])} className={clsx("page-link", { "active": pagenumbers[0] == current_page })}>{pagenumbers[0]}</button></li>

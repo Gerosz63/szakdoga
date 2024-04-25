@@ -26,7 +26,7 @@ export default function List({ results }: { results: { id: number, name: string,
                {
                     results.map((e) =>
                          <div key={e.id} className="fs-5 row justify-content-center border mt-3 rounded py-2 align-items-center shadow mybg-white">
-                              <div className="col-lg-4 fw-bold">{e.name}</div>
+                              <div className="col-lg-4 fw-bold text-truncate">{e.name}</div>
                               <div className="col-lg-4">{e.saveDate.toISOString().replace("T", " ").replace(".000Z", "")}</div>
                               <div className="col-lg-2 text-end">{Math.ceil(e.exec_time * 1000) / 1000} ms</div>
                               <div className="col-lg-2">

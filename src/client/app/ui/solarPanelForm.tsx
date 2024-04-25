@@ -81,7 +81,7 @@ export default function Form({ action, solarPanel }: { action: "ADD" | "MODIFY",
                <div className="row px-md-5 px-2">
                     <div className="col">
                          <h3 className="text-center">A napelemek működése</h3>
-                         <p>A napelemek energiatermelését úgy szimuláljuk, hogy egy harangörbét veszünk alapul. Ennél a görbénél a csúcspontjának a <b>Maximum helyét</b> illetve azt az sugarat melyen belül a görbe pozitív értéket vegyen fel.</p>
+                         <p>A napelemek energiatermelését úgy szimuláljuk, hogy egy harangörbét veszünk alapul. Ennél a görbénél meg kell adnunk a <b>Maximum helyét</b>, illetve azt a <b>sugarat</b> melyen belül a görbe pozitív értéket vegyen fel a csúcspont körül. Ezen felül kell még egy minél kisebb pozitív szám, melyet az említett harangröbe fell kell, hogy vegyen az intervallum szélein.</p>
                     </div>
                </div>
                <hr />

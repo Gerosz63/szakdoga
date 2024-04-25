@@ -1,6 +1,6 @@
 "use client";
 
-import { ChartData } from "@/app/lib/definitions";
+import { chart_settins, ChartData } from "@/app/lib/definitions";
 import { LineChart, LineSeriesType } from "@mui/x-charts";
 import { cheerfulFiestaPalette } from '@mui/x-charts/colorPalettes';
 import { axisClasses } from '@mui/x-charts/ChartsAxis';
@@ -23,18 +23,7 @@ export default function StorageChart({ data }: { data: ChartData }) {
 
      return (
           <LineChart
-               margin={{
-                    left: 100,
-                    right: 120,
-               }}
-               sx={{
-                    [`.${axisClasses.left} .${axisClasses.label}`]: {
-                         transform: `translateX(-${(max.toString().length-1)*6}px)`,
-                    },
-                    [`.${axisClasses.right} .${axisClasses.label}`]: {
-                         transform: `translateX(${(maxs.toString().length-1)}px)`,
-                    },
-               }}
+               {...chart_settins(max, maxs)}
                series={[...series_normal, ...series_store]}
                xAxis={[
                     { data: data.xLabels, scaleType: "point", label: "Idő intervallum" }

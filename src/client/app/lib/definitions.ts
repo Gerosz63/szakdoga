@@ -1,3 +1,5 @@
+import { axisClasses } from "@mui/x-charts";
+
 /**
  * Type of the user in the database.
  */
@@ -315,6 +317,44 @@ export type SolarPanelState = {
      message?: string | null;
 };
 
+/**
+ * Function to create settings for charts y axis label transformation. With this setting we can prevent the label from overlapping the axis ticks.
+ * @param length_left Character length of the maximum value of the y axis
+ * @returns 
+ */
+export const chart_settins = (length_left: number, length_right?: number) => {
+     if (isNaN(length_left))
+          return {};
+     length_left = length_left.toString().length;
+     if (length_right) {
+          length_right = length_right.toString().length;
+          return {
+               sx: {
+                    [`.${axisClasses.left} .${axisClasses.label}`]: {
+                         transform: `translateX(-${(length_left - 1) * 8}px)`,
+                    },
+                    [`.${axisClasses.right} .${axisClasses.label}`]: {
+                         transform: `translateX(${(length_right - 1) * 8}px)`,
+                    },
+               },
+               margin: {
+                    left: 40 + (length_left - 1) * 8,
+                    right: 40 + (length_right - 1) * 8,
+               }
+          };
+     }
+     else
+          return {
+               sx: {
+                    [`.${axisClasses.left} .${axisClasses.label}`]: {
+                         transform: `translateX(-${(length_left - 1) * 8}px)`,
+                    },
+               },
+               margin: {
+                    left: 40 + (length_left - 1) * 8
+               }
+          };
+};
 
 /**
  * list of public routes

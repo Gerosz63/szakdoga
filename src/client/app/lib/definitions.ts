@@ -1,4 +1,3 @@
-import { axisClasses } from "@mui/x-charts";
 
 /**
  * Type of the user in the database.
@@ -198,6 +197,22 @@ export const EnergyStorageNameExchange: EnergyStorage = {
      s0: "Kezdeti töltöttségi szint",
 };
 
+
+/**
+ * Name exchange for solar panel value fields
+ */
+export const SolarPanelValueNameExchange:{[index in (keyof SolarValueErrorState)]:string} = {
+     T: "Idő intervallum",
+     general: "Általános hiba",
+     r_max: "Maximális termelés",
+     shift_start: "Eltolás mértéke",
+     exp_v: "Maximum helye",
+     intval_range: "Sugár mérete",
+     value_at_end: "Görbe szélén lévő érték",
+     addNoise: "Zaj:",
+     seed: "Seed értéke",
+};
+
 /**
  * Type for exchange DB tables sort name fro actual name
  */
@@ -318,43 +333,30 @@ export type SolarPanelState = {
 };
 
 /**
- * Function to create settings for charts y axis label transformation. With this setting we can prevent the label from overlapping the axis ticks.
- * @param length_left Character length of the maximum value of the y axis
- * @returns 
+ * Type of solar panels value query result errors.
  */
-export const chart_settins = (length_left: number, length_right?: number) => {
-     if (isNaN(length_left))
-          return {};
-     length_left = length_left.toString().length;
-     if (length_right) {
-          length_right = length_right.toString().length;
-          return {
-               sx: {
-                    [`.${axisClasses.left} .${axisClasses.label}`]: {
-                         transform: `translateX(-${(length_left - 1) * 8}px)`,
-                    },
-                    [`.${axisClasses.right} .${axisClasses.label}`]: {
-                         transform: `translateX(${(length_right - 1) * 8}px)`,
-                    },
-               },
-               margin: {
-                    left: 40 + (length_left - 1) * 8,
-                    right: 40 + (length_right - 1) * 8,
-               }
-          };
-     }
-     else
-          return {
-               sx: {
-                    [`.${axisClasses.left} .${axisClasses.label}`]: {
-                         transform: `translateX(-${(length_left - 1) * 8}px)`,
-                    },
-               },
-               margin: {
-                    left: 40 + (length_left - 1) * 8
-               }
-          };
+export type SolarValueErrorState = {
+     T?: string[];
+     r_max?: string[];
+     shift_start?: string[];
+     exp_v?: string[];
+     value_at_end?: string[];
+     intval_range?: string[];
+     addNoise?: string[];
+     seed?: string[];
+     general?: string[];
 };
+
+
+/**
+ * Type of solar panels value query result.
+ */
+export type SolarValueState = {
+     success: boolean,
+     result?: { data: number[], labels: number[] },
+     error?: SolarValueErrorState
+}
+
 
 /**
  * list of public routes

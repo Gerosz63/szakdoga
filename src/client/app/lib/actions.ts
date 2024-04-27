@@ -1,12 +1,12 @@
 "use server";
 import { revalidatePath } from "next/cache";
 import { exec_query } from "@/app/lib/db";
-import { DbActionResult, UserState, User, GasEngineState, SolarPanel, GasEngine, EnergyStorage, DbNameExchange, EnergyStorageState, SolarPanelState, Results, SolverData, Charts } from "@/app/lib/definitions";
+import { DbActionResult, UserState, User, GasEngineState, SolarPanel, GasEngine, EnergyStorage, DbNameExchange, EnergyStorageState, SolarPanelState, Results, SolverData, Charts, SolarValueState } from "@/app/lib/definitions";
 import { redirect } from "next/navigation";
 import { hash } from "bcrypt";
 import { signIn, signOut } from "@/auth";
 import { AuthError } from "next-auth";
-import { FormModifySchema, FormSchema, GasEngineSchema, EnergyStorageSchema, SolarPanelSchema } from "@/app/lib/schemas";
+import { FormModifySchema, FormSchema, GasEngineSchema, EnergyStorageSchema, SolarPanelSchema, solarDataSchema } from "@/app/lib/schemas";
 import { escape } from "mysql2";
 import { unstable_noStore as noStore } from 'next/cache';
 import { z } from "zod";
@@ -141,7 +141,7 @@ export async function getUserMaxPage(limit: number = 10) {
      const q = `SELECT CEIL(COUNT(*) / ${limit}) as maxPage FROM user;`;
      const res = await exec_query(q);
      if (res.success) {
-          return {success:true, result: res.result[0].maxPage} as DbActionResult<number>;
+          return { success: true, result: res.result[0].maxPage } as DbActionResult<number>;
      }
      return res as DbActionResult<null>;
 }
@@ -692,19 +692,34 @@ export async function deleteResult(id: number) {
 }
 
 /**
- * Get user results by user id.
+ * Get user results by user id and the searched value.
  * @param uid 
  * @returns 
  */
-export async function getResults(uid: number) {
+export async function getResults(uid: number, search: string, page: number = 1, limit: number = 10) {
      noStore();
-     const q = `SELECT id, name, saveDate, exec_time FROM results WHERE uid = ${uid} AND saved IS TRUE;`;
+     const q = `SELECT id, name, saveDate, exec_time FROM results WHERE uid = ${uid} AND saved IS TRUE${search && " AND name LIKE '%" + escape(search).substring(1, escape(search).length - 1) + "%'"} LIMIT ${(page - 1) * 10},${limit};`;
      const res = await exec_query(q);
      if (!res.success) {
           return { success: false, result: null, message: "Adatbázis hiba!" } as DbActionResult<null>;
      }
      else
           return res as DbActionResult<{ id: number, name: string, saveDate: Date, exec_time: number }[]>;
+}
+
+/**
+ * Returns the number of pages needed for display all results.
+ * @param limit Maximum number of users displayed on a page
+ * @returns 
+ */
+export async function getResultsMaxPage(uid: number, limit: number = 10) {
+     noStore();
+     const q = `SELECT CEIL(COUNT(*) / ${limit}) as maxPage FROM results WHERE uid = ${uid} AND saved IS TRUE;`;
+     const res = await exec_query(q);
+     if (res.success) {
+          return { success: true, result: res.result[0].maxPage } as DbActionResult<number>;
+     }
+     return res as DbActionResult<null>;
 }
 
 /**
@@ -851,3 +866,37 @@ export async function getNewResult(uid: number) {
      res.result = await createChartData(res.result[0]);
      return res as DbActionResult<Charts>;
 }
+
+
+export async function GetSolarValues(T: string | null, value_at_end: string | null, exp_v: string | null, shift_start: string | null, r_max: string | null, addNoise: boolean, seed: string | null, intval_range: string | null) {
+     const validated = solarDataSchema.safeParse({
+          T: T,
+          value_at_end: value_at_end,
+          exp_v: exp_v,
+          shift_start: shift_start,
+          intval_range: intval_range,
+          r_max: r_max,
+          addNoise: addNoise,
+          seed: seed
+     });
+
+     if (validated.success) {
+          const res = await fetch(new URL(process.env.SOLAR_DATA_URL + "?data=" + JSON.stringify(validated.data)));
+          if (res.ok) {
+               const result = await res.json() as { success: boolean, result: number[] | null, message: string | null };
+               if (result.success)
+                    return {
+                         success: true, result: { data: [result.result![0], ...result.result!], labels: Array.from(Array(validated.data.T + 1).keys()) as number[] }
+                    } as SolarValueState;
+               return {
+                    success: false, error: { general: ["API hiba!", result.message] }
+               } as SolarValueState;
+          }
+          else
+               return {
+                    success: false, error: { general: ["API hiba!"] }
+               } as SolarValueState;
+     } else
+          return { success: false, error: validated.error.flatten().fieldErrors } as SolarValueState;
+}
+

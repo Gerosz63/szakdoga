@@ -2,7 +2,7 @@
 import { Suspense } from "react";
 import UserTableSkeleton from "@/app/ui/skeletons/userTableSkeleton";
 import Table from "@/app/ui/userTable";
-import Search from "@/app/ui/userSearch";
+import { SearchUser } from "@/app/ui/userSearch";
 import { getUserMaxPage, listUsers } from "@/app/lib/actions";
 import { auth } from "@/auth";
 import Pagination from "@/app/ui/pagination";
@@ -27,7 +27,7 @@ export default async function Page({
           <div className="container-fluid mt-5">
                <div className="row justify-content-center">
                     <div className="col-md-7">
-                         <Search />
+                         <SearchUser />
                     </div>
                </div>
                <hr />

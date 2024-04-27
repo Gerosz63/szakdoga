@@ -49,12 +49,25 @@ label.required::after {
   background-color: $lightgreen;
 }
 .page-item > .page-link.disabled {
-  background-color: $lightgreen;
+  background-color: $greenblue;
   opacity: 0.7;
-}
-.page-item > .page-link.active {
-  background-color: $darkblue;
   border-color: $greenblue;
 }
+.page-item > .page-link.active, .page-item > .page-link:hover {
+  background-color: $darkblue;
+  border-color: $darkblue;
+  color: $lightgrey;
+}
+.page-item > .page-link {
+  background-color: $lightgreen;
+  color: $darkblue;
+  border-color: $greenblue;
+}
+
+// .page-item > .page-link:hover {
+//   background-color: $greenblue;
+//   color: $darkblue;
+//   border-color: $greenblue;
+// }
 
 @import "~bootstrap/scss/bootstrap.scss";

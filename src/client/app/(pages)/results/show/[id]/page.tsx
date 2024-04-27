@@ -1,8 +1,8 @@
 import { getNewResult, getResultById, sumArrayElementsByIndex } from "@/app/lib/actions";
 import { EnergyStorage, GasEngine, SolarPanel } from "@/app/lib/definitions";
-import ElementChart from "@/app/ui/charts/elementChart";
-import MainChart from "@/app/ui/charts/mainChart";
-import StorageChart from "@/app/ui/charts/storageChart";
+import { ElementChart } from "@/app/ui/charts";
+import { MainChart } from "@/app/ui/charts";
+import { StorageChart } from "@/app/ui/charts";
 import List from "@/app/ui/readonlyGeneratorList";
 import Form from "@/app/ui/saveResultFrom";
 import ChartSkeleton from "@/app/ui/skeletons/chartSkeleton";

@@ -5,7 +5,7 @@ import { DbActionResult, User, UserState } from "@/app/lib/definitions";
 import Link from "next/link";
 import { modifyUser } from "@/app/lib/actions";
 import clsx from 'clsx';
-import { ChangeEvent, useState } from 'react';
+import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 
 export default function Form({ id, userData }: { id: number, userData: DbActionResult<User> | DbActionResult<null> }) {

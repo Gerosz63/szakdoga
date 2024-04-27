@@ -141,12 +141,12 @@ export const EnergyStorageSchema = z.object({
  */
 export const SolarPanelSchema = z.object({
      name: z.string().max(20, "Maximum 20 karakter hosszú név adható meg!"),
-     r_max: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).min(0),
-     delta_r_plus_max: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).min(0),
-     delta_r_minus_max: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).min(0),
+     r_max: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).min(0, "Csak 0 vagy annál nagyobb szám adható meg!"),
+     delta_r_plus_max: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).min(0, "Csak 0 vagy annál nagyobb szám adható meg!"),
+     delta_r_minus_max: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).min(0, "Csak 0 vagy annál nagyobb szám adható meg!"),
      cost: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }),
      r0: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).nullable(),
-     shift_start: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).int("Csak egész szám adható meg!").min(0),
+     shift_start: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).int("Csak egész szám adható meg!").min(0, "Csak 0 vagy annál nagyobb szám adható meg!"),
      exp_v: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }),
      intval_range: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }),
      value_at_end: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }),
@@ -173,4 +173,40 @@ export const SolarPanelSchema = z.object({
                     path: ["r0"]
                });
      }
+});
+
+
+/**
+ * The solar panel maximum production chart query schema.
+ */
+export const solarDataSchema = z.object({
+     T: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).int("Csak egész szám adható meg!").min(1, "Csak 0-nál nagyobb szám adható meg!"),
+     value_at_end: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).superRefine((val, ctx) => {
+          if (val <= 0 || val >= 0.1)
+               ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: "Az értéknek 0 és 0.1 közöttinek kell lennie!",
+                    path: ["value_at_end"]
+               });
+     }),
+     intval_range: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).gt(0, "Csak 0-nál nagyobb szám adható meg!"),
+     exp_v: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }),
+     shift_start: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).int("Csak egész szám adható meg!"),
+     r_max: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).min(0, "Csak 0 vagy annál nagyobb szám adható meg!"),
+     addNoise: z.boolean(),
+     seed: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).int("Csak egész szám adható meg!").nullable()
+}).superRefine((val, ctx) => {
+     if (val.T && val.shift_start && val.T < val.shift_start){
+          ctx.addIssue({
+               code: z.ZodIssueCode.custom,
+               message: "Az időintervallumok számánál az eltolás nem lehet nagyobb!",
+               path: ["T"]
+          });
+          ctx.addIssue({
+               code: z.ZodIssueCode.custom,
+               message: "Az időintervallumok számánál az eltolás nem lehet nagyobb!",
+               path: ["shift_start"]
+          });
+     }
+          
 });

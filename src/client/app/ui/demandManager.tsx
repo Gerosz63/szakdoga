@@ -8,9 +8,9 @@ import { useDebouncedCallback } from 'use-debounce';
 import { z } from "zod";
 import { SetDemandInCookie, simulate } from "@/app/lib/actions";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import { axisClasses, LineChart } from "@mui/x-charts";
 import ErrorAlert from "@/app/ui/errorAlerts";
-import { chart_settins } from "../lib/definitions";
+import { DemandChart } from "@/app/ui/charts";
+import { ChartData } from "@/app/lib/definitions";
 
 
 export default function DemandManager({ uid, localDemand }: { uid: number, localDemand:string }) {
@@ -49,7 +49,7 @@ export default function DemandManager({ uid, localDemand }: { uid: number, local
 
      }, 300);
 
-     const max_value = Math.max(...demandState.value);
+     const chart_val = demandState.value.length == 0 ? [] : [demandState.value[0], ...demandState.value];
      async function simulateOnclickHandler() {
           if (demandState.state)
                return;
@@ -92,17 +92,7 @@ export default function DemandManager({ uid, localDemand }: { uid: number, local
                     </div>
                     <div className="row justify-content-center collapse" id="collapseDemand">
                          <div className="col-9 bg-light shadow mt-2 rounded-4" style={{ height: "300px" }}>
-                              <LineChart
-                                   {...chart_settins(isNaN(max_value) ? 1 : max_value)}
-                                   series={[
-                                             {data: demandState.value, label: "Fogyasztás", curve: "step"}
-                                        ]}
-                                   xAxis={[
-                                        { data: Array.from(Array(demandState.value.length).keys()) as number[], scaleType: "point", label: "Idő intervallum" }
-                                   ]}
-                                   yAxis={[
-                                        { label: "Fogyaztás mértéke", min: 0, max: max_value * 1.1, position: "left" }]}
-                              />
+                              <DemandChart data={{xLabels:Array.from(Array(demandState.value.length).keys()) as number[], chartdata:[{name:"Fogyasztás", data: chart_val}]} as ChartData}/>
                          </div>
                     </div>
                </div>

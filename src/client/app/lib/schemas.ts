@@ -6,8 +6,8 @@ import { getUserById, isUserExists } from "@/app/lib/actions";
  */
 export const FormModifySchema = z.object({
      id: z.number(),
-     username: z.string(),
-     password: z.string().nullable(),
+     username: z.string().max(20, "A felhasználónév hossza nem haladhatja meg a 20 karaktert!"),
+     password: z.string().min(6, "A jelszónak legalább 6 kerekter hosszúnak kell lennie!").nullable(),
      role: z.enum(["admin", "user"]).nullable(),
 }).superRefine(async (val, ctx) => {
      const userId = await isUserExists(val.id);
@@ -35,9 +35,9 @@ export const FormModifySchema = z.object({
  * Validation schema for adding new user
  */
 export const FormSchema = z.object({
-     username: z.string(),
-     password: z.string(),
-     password_rep: z.string(),
+     username: z.string().max(20, "A felhasználónév hossza nem haladhatja meg a 20 karaktert!"),
+     password: z.string().min(6, "A jelszónak legalább 6 kerekter hosszúnak kell lennie!"),
+     password_rep: z.string().min(6, "A jelszónak legalább 6 kerekter hosszúnak kell lennie!"),
      role: z.enum(["admin", "user"]),
 }).superRefine(async (data, ctx) => {
      if (data.password !== data.password_rep) {
@@ -148,8 +148,8 @@ export const SolarPanelSchema = z.object({
      r0: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).nullable(),
      shift_start: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).int("Csak egész szám adható meg!").min(0, "Csak 0 vagy annál nagyobb szám adható meg!"),
      exp_v: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }),
-     intval_range: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }),
-     value_at_end: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }),
+     intval_range: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).gte(0, "Csak 0-nál nagyobb érték adható meg."),
+     value_at_end: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).gte(0, "Csak 0-nál nagyobb érték adható meg.").max(0.1, "A megadott érték nem haladhatja meg a 0.1-et!"),
      addNoise: z.enum(["0", "1"]),
      seed: z.coerce.number({ invalid_type_error: "Csak szám adható meg!" }).int("Csak egész szám adható meg!").nullable(),
 }).superRefine((val, ctx) => {

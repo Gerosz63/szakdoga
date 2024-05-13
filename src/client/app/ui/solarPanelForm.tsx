@@ -97,7 +97,7 @@ export default function Form({ action, solarPanel }: { action: "ADD" | "MODIFY",
                <div className="row align-items-center justify-content-center">
                     <div className="col"><hr /></div>
                     <div className="col-auto">
-                         <Link data-bs-toggle="collapse" href="#collapseInfo" role="button" aria-expanded="false" aria-controls="collapseInfo"><FontAwesomeIcon className="text-secondary bg-light fs-5" icon={faCircleInfo} /></Link>
+                         <Link data-bs-toggle="collapse" href="#collapseInfo" role="button" aria-expanded="false" aria-controls="collapseInfo"><FontAwesomeIcon className="text-secondary fs-5" icon={faCircleInfo} /></Link>
                     </div>
                     <div className="col"><hr /></div>
                </div>

@@ -154,7 +154,7 @@ export async function getUserMaxPage(limit: number = 10) {
  */
 export async function getUserById(id: number) {
      noStore();
-     const q = await `SELECT username, role FROM user WHERE id = ${id};`;
+     const q = await `SELECT username, role, theme FROM user WHERE id = ${id};`;
      const res = await exec_query(q);
 
      if (!res.success) {
@@ -175,16 +175,16 @@ export async function getUserById(id: number) {
  */
 export async function getUserByName(name: string) {
      noStore();
-     const q = `SELECT id, username, password, role FROM user WHERE username = ${escape(name)};`;
+     const q = `SELECT id, username, password, role, theme FROM user WHERE username = ${escape(name)};`;
      const res = await exec_query(q);
 
      if (!res.success) {
           console.log(res?.message);
-          return { message: "Adatbázis hiba.", success: false, result: null } as DbActionResult<null>;
+          return { message: "Adatbázis hiba.", success: false, result: 0 } as DbActionResult<number>;
      }
      else if (res.result.length == 0) {
           console.log("A felhasználó nem létezik!")
-          return { message: "A felhasználó nem létezik!", success: false, result: null } as DbActionResult<null>;
+          return { message: "A felhasználó nem létezik!", success: false, result: 1 } as DbActionResult<number>;
      }
      return { success: true, result: res.result[0] as User } as DbActionResult<User>;
 }
@@ -206,7 +206,7 @@ export async function login(prevState: string | undefined, formData: FormData) {
                     case "CredentialsSignin":
                          return "Hibás felhasználónév vagy jelszó!";
                     default:
-                         return "Hiba történt próbáld később!";
+                         return "Hiba történt, próbáld később!";
                }
           }
           throw error;
@@ -649,7 +649,7 @@ export async function simulate(uid: number, demand: number[]) {
           }
           redirect("/results/show/new");
      }
-     return { error: "A feladat nem optimalizálható!" };
+     return { error: result.result };
 }
 
 /**
@@ -900,3 +900,9 @@ export async function GetSolarValues(T: string | null, value_at_end: string | nu
           return { success: false, error: validated.error.flatten().fieldErrors } as SolarValueState;
 }
 
+export async function setUserTheme(uid:number, theme: "light"|"dark") {
+     const q = `UPDATE user SET theme = '${theme}' WHERE id = ${uid};`;
+     const res = exec_query(q);
+     revalidatePath("/");
+     return res;
+}

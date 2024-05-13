@@ -49,7 +49,7 @@ export default function Form() {
           <form action={dispatch}>
                <div className="mb-3">
                     <label className="form-label fs-bold required" htmlFor="username">Felhasználónév:</label>
-                    <input onChange={(e) => inputChange(e.target.name)} className={clsx("form-control", {"is-invalid": state.errors?.username && userNameState, "is-valid": userNameState && Object.keys(state.errors ?? {}).length !== 0 && !state.errors?.username})} type="text" name="username" id="username" required/>
+                    <input onChange={(e) => inputChange(e.target.name)} className={clsx("form-control", {"is-invalid": state.errors?.username && userNameState, "is-valid": userNameState && Object.keys(state.errors ?? {}).length !== 0 && !state.errors?.username})} type="text" name="username" id="username" maxLength={20} required/>
                     {
                          (state.errors?.username && userNameState) &&
                          <div className='invalid-feedback'>

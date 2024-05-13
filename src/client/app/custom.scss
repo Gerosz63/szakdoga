@@ -30,10 +30,6 @@ $mycolors: (
   }
 }
 
-nav .navbar-nav .nav-link.active {
-  background-color: $darkblue;
-  color: $lightgrey;
-}
 
 .cursor-pointer {
   cursor: pointer;
@@ -44,30 +40,140 @@ label.required::after {
   color: red;
   font-weight: bold;
 }
-
-.page-link {
-  background-color: $lightgreen;
+nav .navbar-nav .nav-link.active {
+  background-color: $darkblue;
+  color: $lightgrey;
 }
 .page-item > .page-link.disabled {
   background-color: $greenblue;
   opacity: 0.7;
   border-color: $greenblue;
 }
-.page-item > .page-link.active, .page-item > .page-link:hover {
-  background-color: $darkblue;
-  border-color: $darkblue;
-  color: $lightgrey;
+.page-item > .page-link.active {
+  background-color: $lightgreen;
+  border-color: $lightgreen;
+  color: $darkblue;
+}
+.page-item > .page-link:hover {
+  background-color: #c8d1da;
+  border-color: #c8d1da;
+  color: $darkblue;
 }
 .page-item > .page-link {
-  background-color: $lightgreen;
-  color: $darkblue;
-  border-color: $greenblue;
+  background-color: $darkblue;
+  color: $lightgrey;
+  border-left-color: $lightgrey;
+  border-right-color: $lightgrey;
+}
+.text-shadow {
+  text-shadow: 2px 2px 5px black;
 }
 
-// .page-item > .page-link:hover {
-//   background-color: $greenblue;
-//   color: $darkblue;
-//   border-color: $greenblue;
-// }
-
 @import "~bootstrap/scss/bootstrap.scss";
+
+@include color-mode(dark) {
+  $lightgreen: #448a7e;
+  $lightgrey: #434b54;
+  $darkblue: #f0f4f9;
+  $greenblue: #3fde94;
+  $primary: #2196f3 !default;
+  $secondary: $darkblue !default;
+  $success: #4caf50 !default;
+  $light: $darkblue;
+  --bs-body-color: #ffffff;
+  //$warning: #3482f7 !default;
+
+  $font-size-base: 1.15rem !default;
+
+  .text-shadow {
+    text-shadow: 5px 5px 10px black;
+  }
+
+  $mycolors: (
+    "green": $lightgreen,
+    "grey": $lightgrey,
+    "darkblue": $darkblue,
+    "greenblue": $greenblue,
+    "white": #2e3236,
+  );
+
+  @each $type, $color in $mycolors {
+    .mybg-#{$type} {
+      background-color: $color;
+    }
+    .mytext-#{$type} {
+      color: $color;
+    }
+  }
+  .btn-outline-secondary {
+    --bs-btn-color: #f0f4f9 !important;
+    --bs-btn-border-color: #f0f4f9 !important;
+    --bs-btn-hover-color: #212529 !important;
+    --bs-btn-hover-bg: #f0f4f9 !important;
+    --bs-btn-hover-border-color: #f0f4f9 !important;
+    --bs-btn-focus-shadow-rgb: 67, 75, 84;
+    --bs-btn-active-color: #212529 !important;
+    --bs-btn-active-bg: #f0f4f9 !important;
+    --bs-btn-active-border-color: #f0f4f9 !important;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: #f0f4f9 !important;
+    --bs-btn-disabled-bg: transparent;
+    --bs-btn-disabled-border-color: #f0f4f9 !important;
+    --bs-gradient: none;
+}
+
+
+  .btn-secondary {
+    background-color: #212529 !important;
+  }
+  .bg-light {
+    background-color: #212529 !important;
+  }
+  .text-secondary {
+    color: #f0f4f9 !important;
+  }
+  .text-dark {
+    color: #fff !important;
+  }
+
+  .cursor-pointer {
+    cursor: pointer;
+  }
+
+  label.required::after {
+    content: "*";
+    color: red;
+    font-weight: bold;
+  }
+  nav .navbar-nav .nav-link {
+    color: #FFF;
+  }
+  nav .navbar-nav .nav-link.active {
+    background-color: $darkblue;
+    color: $lightgrey;
+  }
+  .page-item > .page-link.disabled {
+    background-color: $lightgreen;
+    opacity: 0.7;
+    border-color: $lightgreen;
+  }
+  .page-item > .page-link.active {
+    background-color: $greenblue;
+    border-color: $greenblue;
+    color: $darkblue;
+  }
+  .page-item > .page-link:hover {
+    background-color: $darkblue;
+    border-color: $darkblue;
+    color: $lightgrey;
+  }
+  .page-item > .page-link {
+    background-color: #2e3236;
+    color: $darkblue;
+    border-left-color: $darkblue;
+    border-right-color: $darkblue;
+  }
+  .text-shadow {
+    text-shadow: 2px 2px 5px black;
+  }
+}

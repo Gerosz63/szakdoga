@@ -54,7 +54,7 @@ export default function DemandManager({ uid, localDemand }: { uid: number, local
           if (demandState.state)
                return;
           const res = await simulate(uid, demandState.value);
-          if (res.error)
+          if (res && res.error)
                SetSimState({success: false, message: res.error});
      }
 
@@ -92,7 +92,7 @@ export default function DemandManager({ uid, localDemand }: { uid: number, local
                     </div>
                     <div className="row justify-content-center collapse" id="collapseDemand">
                          <div className="col-9 bg-light shadow mt-2 rounded-4" style={{ height: "300px" }}>
-                              <DemandChart data={{xLabels:Array.from(Array(demandState.value.length).keys()) as number[], chartdata:[{name:"Fogyasztás", data: chart_val}]} as ChartData}/>
+                              <DemandChart data={{xLabels:Array.from(Array(demandState.value.length + 1).keys()) as number[], chartdata:[{name:"Fogyasztás", data: chart_val}]} as ChartData}/>
                          </div>
                     </div>
                </div>

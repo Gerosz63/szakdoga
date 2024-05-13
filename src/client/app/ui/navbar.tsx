@@ -3,15 +3,22 @@ import Link from "next/link";
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUser } from '@fortawesome/free-regular-svg-icons';
-import { logout } from "@/app/lib/actions";
+import { faMoon, faUser } from '@fortawesome/free-regular-svg-icons';
+import { logout, setUserTheme } from "@/app/lib/actions";
 import { useSession } from "next-auth/react";
-import { faArrowRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRightFromBracket, faSun } from "@fortawesome/free-solid-svg-icons";
 
 export default function Navbar() {
-     const user = useSession().data?.user;
-
+     const { data, update } = useSession();
+     const user = data?.user;
      const linkPath = usePathname();
+
+
+     function setTheme(color: "dark" | "light") {
+          setUserTheme(+user?.id!, color);
+          update({ ...user!, theme: color });
+     }
+
      const links = [
           {
                name: "simulator",
@@ -53,12 +60,20 @@ export default function Navbar() {
                               })}
                          </ul>
                          <div className="d-flex">
+                              <div className="dropdown mx-2">
+                                   <button className="btn btn-secondary alig-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <span className="border-end pe-2">Téma</span> <FontAwesomeIcon className="ms-1" icon={user?.theme == "dark" ? faMoon : faSun} />
+                                   </button>
+                                   <ul className="dropdown-menu dropdown-menu-lg-end dropdown-menu-start">
+                                        <li><button onClick={() => setTheme("light")} className="dropdown-item">Világos <FontAwesomeIcon className="ms-1" icon={faSun} /></button></li>
+                                        <li><button onClick={() => setTheme("dark")} className="dropdown-item">Sötét <FontAwesomeIcon className="ms-1" icon={faMoon} /></button></li>
+                                   </ul>
+                              </div>
                               <div className="dropdown">
                                    <button className="btn btn-secondary alig-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         <span className="border-end pe-2">{user?.name}</span> <FontAwesomeIcon className="ms-1" icon={faUser} />
                                    </button>
                                    <ul className="dropdown-menu dropdown-menu-lg-end dropdown-menu-start">
-                                        <li></li>
                                         <li><Link className="dropdown-item" href="/profile">Profilom</Link></li>
                                         <li><hr className="dropdown-divider" /></li>
                                         <li>

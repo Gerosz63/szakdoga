@@ -47,7 +47,7 @@ export default function Form({ id, userData }: { id: number, userData: DbActionR
           <form action={dispatch}>
                <div className="mb-3">
                     <label className="form-label" htmlFor="username">Felhasználónév:</label>
-                    <input defaultValue={userData.result?.username} onChange={(e) => inputChange(e.target.name)} className={clsx("form-control", { "is-invalid": state.errors?.username && userNameState, "is-valid": userNameState && Object.keys(state.errors ?? {}).length !== 0 && !state.errors?.username })} type="text" name="username" id="username" required />
+                    <input maxLength={20} defaultValue={userData.result?.username} onChange={(e) => inputChange(e.target.name)} className={clsx("form-control", { "is-invalid": state.errors?.username && userNameState, "is-valid": userNameState && Object.keys(state.errors ?? {}).length !== 0 && !state.errors?.username })} type="text" name="username" id="username" required />
                     {
                          (state.errors?.username && userNameState) &&
                          <div className='invalid-feedback'>

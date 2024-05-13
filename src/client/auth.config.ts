@@ -1,6 +1,5 @@
 import type { NextAuthConfig } from 'next-auth';
 import { adminRoute, apiAuthRoute, authRoutes, defaultLoginRedirect, publicRoutes } from './app/lib/definitions';
-import { getUserById } from './app/lib/actions';
 
 
 export const authConfig = {
@@ -47,9 +46,10 @@ export const authConfig = {
                }
                if (token.role && session.user) {
                     session.user.role = token.role as "admin" | "user";
-
                }
-
+               if (token.theme && session.user) {
+                    session.user.theme = token.theme as "dark" | "light";
+               }
                return session;
           },
      },

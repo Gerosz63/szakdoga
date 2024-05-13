@@ -4,16 +4,18 @@ import Credentials from 'next-auth/providers/credentials';
 import { z } from 'zod';
 import { compare } from 'bcrypt';
 import { getUserByName } from '@/app/lib/actions';
-import { getUserById } from './app/lib/actions';
-
+import { getUserById } from '@/app/lib/actions';
+import { User } from '@/app/lib/definitions'
 
 declare module "next-auth" {
      interface User {
-          role: "admin" | "user"
+          role: "admin" | "user",
+          theme: "dark" | "light"
      }
      interface Session {
           user: {
-               role: "admin" | "user"
+               role: "admin" | "user",
+               theme: "dark" | "light"
           } & DefaultSession["user"]
      }
 }
@@ -31,10 +33,11 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
                     if (parsedCredentials.success) {
                          const { username, password } = parsedCredentials.data;
                          const user = await getUserByName(username);
-                         if (!user.success)
+                         if (!user.success && user.result === 0)
                               throw new Error("Adatbázis hiba!");
-
-                         const passwordMatch = await compare(password, user.result?.password!);
+                         else if (!user.success && user.result === 1)
+                              return null;
+                         const passwordMatch = await compare(password, (user.result as User).password!);
                          if (passwordMatch) {
                               console.log(user.result);
                               return user.result;
@@ -57,7 +60,7 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
                     return token;
                token.name = res.result?.username;
                token.role = res.result?.role;
-
+               token.theme = res.result?.theme;
 
                return token;
           },
@@ -68,9 +71,10 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
                }
                if (token.role && session.user) {
                     session.user.role = token.role as "admin" | "user";
-
                }
-
+               if (token.theme && session.user) {
+                    session.user.theme = token.theme as "dark" | "light";
+               }
                return session;
           },
      }

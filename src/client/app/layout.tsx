@@ -18,9 +18,10 @@ export default async function RootLayout({
      children: React.ReactNode;
 }>) {
      const session = await auth();
+     
      return (
           <SessionProvider session={session}>
-               <html lang="hu">
+               <html lang="hu" data-bs-theme={session?.user.theme ?? "light"}>
                     <body className={clsx("mybg-grey", inter.className)}>{children}</body>
                </html>
           </SessionProvider>

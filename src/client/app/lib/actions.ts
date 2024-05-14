@@ -632,7 +632,7 @@ export async function simulate(uid: number, demand: number[]) {
           return { error: "A szimulátor nem válaszól!" };
      }
 
-     const result = await res.json() as { success: boolean, result: number[], exec_time: number };
+     const result = await res.json() as { success: boolean, result: number[]|string, exec_time: number };
 
      if (result.success) {
           // Delete unsaved results.
@@ -640,7 +640,7 @@ export async function simulate(uid: number, demand: number[]) {
           await exec_query(q);
 
           // Creates a result line in the db which can be loaded later and saved later. 
-          data.result = result.result;
+          data.result = result.result as number[];
           q = `INSERT INTO results (uid, data, exec_time, saveDate) VALUES (${uid}, ${escape(JSON.stringify(data))}, ${result.exec_time}, NOW());`;
           const res = await exec_query(q);
           if (!res.success) {
@@ -649,7 +649,7 @@ export async function simulate(uid: number, demand: number[]) {
           }
           redirect("/results/show/new");
      }
-     return { error: result.result };
+     return { error: result.result as string };
 }
 
 /**

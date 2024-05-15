@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql.caesar.elte.hu
--- Generation Time: May 07, 2024 at 01:07 PM
+-- Generation Time: May 15, 2024 at 01:42 PM
 -- Server version: 5.5.60-0+deb7u1
 -- PHP Version: 5.6.40-0+deb8u12
 
@@ -117,6 +117,13 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
+-- Dumping data for table `user`
+--
+
+INSERT INTO `user` (`username`, `password`, `role`, `theme`) VALUES
+('admin', '$2b$10$Tlr/YRbC45Rdj6tEK3eu.ubfelVEqcP7NxUqGqtMB4p2UEjchM8Jq', 'admin', 'light');
+
+--
 -- Indexes for dumped tables
 --
 
@@ -174,7 +181,7 @@ ALTER TABLE `gas_engines`
 -- AUTO_INCREMENT for table `results`
 --
 ALTER TABLE `results`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `solar_panel`
@@ -186,7 +193,7 @@ ALTER TABLE `solar_panel`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

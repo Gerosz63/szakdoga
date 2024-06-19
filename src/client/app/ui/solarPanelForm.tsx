@@ -31,7 +31,7 @@ export default function Form({ action, solarPanel }: { action: "ADD" | "MODIFY",
      const [intval_rangeState, SetIntval_range] = useState({ state: true, value: solarPanel?.intval_range.toString() ?? "7" });
      const [value_at_endState, SetValue_at_end] = useState({ state: true, value: solarPanel?.value_at_end.toString() ?? "0.001" });
      const [addNoiseState, SetAddNoise] = useState({ state: true, value: solarPanel?.addNoise.toString() ?? "0" });
-     const [seedState, SetSeed] = useState({ state: true, value: solarPanel?.seed.toString() ?? "" });
+     const [seedState, SetSeed] = useState({ state: true, value: solarPanel?.seed?.toString() ?? "" });
 
 
      const [t, SetT] = useState("24");
